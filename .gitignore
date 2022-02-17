@@ -35,3 +35,9 @@ out
 
 #config
 config.json
+
+#own file stuff
+
+latest.log
+latest.log.lck
+log
