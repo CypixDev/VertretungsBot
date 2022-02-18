@@ -53,13 +53,14 @@ public class SQLConnector {
 
             executeUpdate("CREATE TABLE IF NOT EXISTS notification(" +
                     "user_id INT NOT NULL, class CHAR(6)," +
-                    "FOREIGN KEY (user_id) PREFERENCE user(user_id) ON DELETE CASCADE," +
+                    "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE," +
                     "CONSTRAINT uc_class UNIQUE (user_id, class));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry(" +
                     "entry_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "registration_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                     "last_refresh_timestamp TIMESTAMP NOT NULL," +
+                    "representation_date TIMESTAMP NOT NULL," +
                     "class CHAR(6) NOT NULL, " +
                     "default_hour CHAR(6) NOT NULL, " +
                     "default_room CHAR(4) NOT NULL, " +

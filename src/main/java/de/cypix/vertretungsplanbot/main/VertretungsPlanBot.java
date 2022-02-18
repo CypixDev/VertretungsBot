@@ -8,6 +8,10 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import de.cypix.vertretungsplanbot.bot.MyBotUpdateListener;
+import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
+import de.cypix.vertretungsplanbot.bot.commands.cmds.CMDHelp;
+import de.cypix.vertretungsplanbot.bot.commands.cmds.CMDNotify;
+import de.cypix.vertretungsplanbot.bot.commands.cmds.CMDStart;
 import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.console.ConsoleManager;
 import de.cypix.vertretungsplanbot.sql.SQLConnector;
@@ -31,6 +35,7 @@ public class VertretungsPlanBot {
     private static VertretungsPlanBot instance;
 
     private static TelegramBot bot;
+    private static CommandManager commandManager;
     private static SQLConnector sqlConnector;
     private static ConfigManager configManager;
     private static ConsoleManager consoleManager;
@@ -42,13 +47,20 @@ public class VertretungsPlanBot {
         instance = new VertretungsPlanBot();
         configManager = new ConfigManager();
         consoleManager = new ConsoleManager();
+        commandManager = new CommandManager();
+        updater = new Updater();
         consoleManager.start();
+        registerCommands();
 
         if(configManager.isStatingAutomatically()){
             instance.startSQL();
             instance.startBot();
+            instance.startUpdater();
         }
-        //TODO: Save TOKEN local!
+    }
+
+    private void startUpdater() {
+        getUpdater().start();
     }
 
     public void startBot(){
@@ -77,6 +89,13 @@ public class VertretungsPlanBot {
             }
         });
     }
+
+    private static void registerCommands() {
+        commandManager.registerCommand("help", new CMDHelp());
+        commandManager.registerCommand("start", new CMDStart());
+        commandManager.registerCommand("notify", new CMDNotify());
+    }
+
 
     public void startSQL(){
         sqlConnector = new SQLConnector(true);
@@ -137,5 +156,9 @@ public class VertretungsPlanBot {
 
     public static Updater getUpdater() {
         return updater;
+    }
+
+    public static CommandManager getCommandManager() {
+        return commandManager;
     }
 }

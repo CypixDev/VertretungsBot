@@ -1,17 +1,10 @@
 package de.cypix.vertretungsplanbot.console;
 
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.SendResponse;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ConsoleManager extends Thread{
 
@@ -45,8 +38,6 @@ public class ConsoleManager extends Thread{
 
         if(args.length == 1){
             if(args[0].equalsIgnoreCase("update")){
-                //TasksManager.updateTaskOverview();
-                //TODO
                 Updater.filter();
                 System.out.println("updated!");
             }
@@ -78,7 +69,7 @@ public class ConsoleManager extends Thread{
                     VertretungsPlanBot.getInstance().startBot();
                     return;
                 }
-                if(args[1].equalsIgnoreCase("schedulers")){
+                if(args[1].equalsIgnoreCase("updater")){
                     VertretungsPlanBot.getUpdater().start();
                 }
             }
@@ -93,10 +84,6 @@ public class ConsoleManager extends Thread{
                     System.out.println("Bot is now offline!");
                     return;
                 }
-                if(args[1].equalsIgnoreCase("schedulers")){
-                    VertretungsPlanBot.getUpdater().stop();
-                    //TasksCheckBot.getReminderManager().getReminderScheduler().cancel(); //TODO: Don't know if its working and you can maybe not start it again
-                }
             }
         }
         if(args.length == 3){
@@ -106,9 +93,6 @@ public class ConsoleManager extends Thread{
                     VertretungsPlanBot.getInstance().startBot(token);
                     System.out.println("Start Bot....");
                     return;
-                }
-                if(args[1].equalsIgnoreCase("scheduler")){
-                    //VertretungsPlanBot.getReminderManager().run();//TODO: don't know if its working or not...
                 }
             }
         }
