@@ -47,7 +47,6 @@ public class Updater extends Thread {
                                     case 0://same
                                         exist = true;
                                         //Nothing to do....
-                                        //update
                                         break;
 
                                     case 1://same defaults
@@ -61,6 +60,9 @@ public class Updater extends Thread {
                             }
                             if(!exist){
                                 SQLManager.insertNewEntry(newEntry);
+                                for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
+                                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass, "Änderung in "+newEntry.getNewSubject()+" und so weiter...."));
+                                }
                             }
                         }
 

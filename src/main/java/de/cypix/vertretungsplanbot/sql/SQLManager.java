@@ -180,7 +180,7 @@ public class SQLManager {
         return list;
     }
     public static List<VertretungsEntry> getAllRelevantEntriesByClass(String className){
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE class='"+className+"' AND representation_date >= CURRENT_TIMESTAMP;");
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE class='"+className+"' AND representation_date >= CURRENT_DATE;");
         List<VertretungsEntry> list = new ArrayList<>();
         try{
             while(rs.next()){

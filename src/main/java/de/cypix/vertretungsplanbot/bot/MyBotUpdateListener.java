@@ -11,6 +11,7 @@ public class MyBotUpdateListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         for (Update update : updates) {
+            System.out.println("Incoming message: "+update.message().text());
             String message = update.message().text();
             String[] args = message.split(" ");
             //call command

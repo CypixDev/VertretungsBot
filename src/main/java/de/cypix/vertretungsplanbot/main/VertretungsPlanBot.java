@@ -91,9 +91,9 @@ public class VertretungsPlanBot {
     }
 
     private static void registerCommands() {
-        commandManager.registerCommand("help", new CMDHelp());
-        commandManager.registerCommand("start", new CMDStart());
-        commandManager.registerCommand("notify", new CMDNotify());
+        commandManager.registerCommand("/help", new CMDHelp());
+        commandManager.registerCommand("/start", new CMDStart());
+        commandManager.registerCommand("/notify", new CMDNotify());
     }
 
 

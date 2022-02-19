@@ -60,7 +60,7 @@ public class SQLConnector {
                     "entry_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "registration_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                     "last_refresh_timestamp TIMESTAMP NOT NULL," +
-                    "representation_date TIMESTAMP NOT NULL," +
+                    "representation_date DATE NOT NULL," +
                     "class CHAR(6) NOT NULL, " +
                     "default_hour CHAR(6) NOT NULL, " +
                     "default_room CHAR(4) NOT NULL, " +
