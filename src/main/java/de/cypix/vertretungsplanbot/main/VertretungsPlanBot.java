@@ -1,17 +1,12 @@
 package de.cypix.vertretungsplanbot.main;
 
-import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.impl.TelegramBotClient;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.GetUpdates;
-import com.pengrad.telegrambot.response.GetUpdatesResponse;
-import de.cypix.vertretungsplanbot.bot.MyBotUpdateListener;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyOverview;
+import de.cypix.vertretungsplanbot.bot.listener.BotListener;
 import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
-import de.cypix.vertretungsplanbot.bot.commands.cmds.CMDHelp;
-import de.cypix.vertretungsplanbot.bot.commands.cmds.CMDNotify;
-import de.cypix.vertretungsplanbot.bot.commands.cmds.CMDStart;
+import de.cypix.vertretungsplanbot.bot.commands.cmds.*;
 import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.console.ConsoleManager;
 import de.cypix.vertretungsplanbot.sql.SQLConnector;
@@ -25,7 +20,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -36,6 +30,7 @@ public class VertretungsPlanBot {
 
     private static TelegramBot bot;
     private static CommandManager commandManager;
+    private static KeyboardCallbackManager keyBoardCallBackManager;
     private static SQLConnector sqlConnector;
     private static ConfigManager configManager;
     private static ConsoleManager consoleManager;
@@ -48,9 +43,13 @@ public class VertretungsPlanBot {
         configManager = new ConfigManager();
         consoleManager = new ConsoleManager();
         commandManager = new CommandManager();
+        keyBoardCallBackManager = new KeyboardCallbackManager();
         updater = new Updater();
         consoleManager.start();
+
+        //Register things
         registerCommands();
+        registerKeyBoardCallBacks();
 
         if(configManager.isStatingAutomatically()){
             instance.startSQL();
@@ -69,31 +68,20 @@ public class VertretungsPlanBot {
     }
     public void startBot(String token){
         bot = new TelegramBot(token);
-        bot.setUpdatesListener(new MyBotUpdateListener());
+        bot.setUpdatesListener(new BotListener());
 
-        GetUpdates getUpdates = new GetUpdates().limit(100).offset(0).timeout(0);
-
-
-        bot.execute(getUpdates, new Callback<GetUpdates, GetUpdatesResponse>() {
-            @Override
-            public void onResponse(GetUpdates request, GetUpdatesResponse response) {
-                List<Update> updates = response.updates();
-                for (Update update : updates) {
-                    System.out.println(update.message().text());
-                }
-            }
-
-            @Override
-            public void onFailure(GetUpdates request, IOException e) {
-                System.out.println("Error while getting updates");
-            }
-        });
     }
 
     private static void registerCommands() {
+        commandManager.registerCommand("/test", new CMDTest());
         commandManager.registerCommand("/help", new CMDHelp());
         commandManager.registerCommand("/start", new CMDStart());
         commandManager.registerCommand("/notify", new CMDNotify());
+        commandManager.registerCommand("/notifylist", new CMDNotifyList());
+    }
+
+    private static void registerKeyBoardCallBacks(){
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOverview());
     }
 
 
@@ -160,5 +148,13 @@ public class VertretungsPlanBot {
 
     public static CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public static ConsoleManager getConsoleManager() {
+        return consoleManager;
+    }
+
+    public static KeyboardCallbackManager getKeyboardCallbackManager() {
+        return keyBoardCallBackManager;
     }
 }
