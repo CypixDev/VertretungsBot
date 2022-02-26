@@ -15,6 +15,9 @@ import java.util.*;
 
 public class Updater extends Thread {
 
+
+    //DONT TOUCH!
+
     private static LocalDateTime lastRefreshTimeStamp = null;
     private static LocalDate representationDate = null;
 
