@@ -40,4 +40,4 @@ config.json
 
 latest.log
 latest.log.lck
-log
+log/
