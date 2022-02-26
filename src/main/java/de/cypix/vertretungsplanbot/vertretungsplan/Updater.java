@@ -21,6 +21,8 @@ public class Updater extends Thread {
     private static LocalDateTime lastRefreshTimeStamp = null;
     private static LocalDate representationDate = null;
 
+    private static boolean DEBUG = false;
+
     @Override
     public void run() {
         try {
@@ -29,7 +31,7 @@ public class Updater extends Thread {
                     URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
                     Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
 
-                    System.out.println("Vergleiche: "
+                    if(DEBUG) System.out.println("Vergleiche: "
                             + getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) +
                             " und "
                             + SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
@@ -79,7 +81,7 @@ public class Updater extends Thread {
                                     System.out.println();*/
                                     exist = true;
                                     SQLManager.updateEntry(newEntry);
-                                    System.out.println("entry updated!");
+                                    if(DEBUG) System.out.println("entry updated!");
                                         /*for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                             VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass, "Änderung in "+newEntry.getNewSubject()+" und so weiter...."));
                                         }
@@ -108,7 +110,7 @@ public class Updater extends Thread {
                 long chatId = 259699517; //Chat id von Pius
 
 
-                Thread.sleep(6000); //second
+                Thread.sleep(60000); //second
 
                 //Vergleiche: 23.02.2022 11:03:40 und 23.02.2022 13:11:52
             }
@@ -139,7 +141,7 @@ public class Updater extends Thread {
             if (line.contains(pattStart)) {
                 line = line.replace("<tr style='background-color: #FFFFFF;'><td style='font-weight: bold; padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                System.out.println("Klasse: " + line);
+                if(DEBUG) System.out.println("Klasse: " + line);
                 String defaultClass = line;
                 line = scanner.nextLine(); //skip "Lehrer"
                 line = line.replace("&nbsp;", " ");
@@ -150,7 +152,7 @@ public class Updater extends Thread {
 
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                System.out.println("Stunden: " + line);
+                if(DEBUG) System.out.println("Stunden: " + line);
                 String defaultHour = line;
 
                 //Raum
@@ -158,7 +160,7 @@ public class Updater extends Thread {
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                System.out.println("Raum: " + line);
+                if(DEBUG) System.out.println("Raum: " + line);
                 String defaultRoom = line;
 
                 //Lehrer
@@ -168,28 +170,28 @@ public class Updater extends Thread {
                 line = line.replace("&auml;", "ä");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                System.out.println("Lehrer: " + line);
+                if(DEBUG) System.out.println("Lehrer: " + line);
                 String defaultTeacher = line;
                 //Fach
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                System.out.println("Fach: " + line);
+                if(DEBUG) System.out.println("Fach: " + line);
                 String defaultSubject = line;
                 //Grund
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                System.out.println("Grund: " + line);
+                if(DEBUG) System.out.println("Grund: " + line);
                 //Fach
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("&auml;", "ä");
                 line = line.replace("<td rowspan='2' style='padding: 2px; border: 1px solid #000000; vertical-align: top;'>", "");
                 line = line.replace("</td></tr>", "");
-                System.out.println("Aktion: " + line);
+                if(DEBUG) System.out.println("Aktion: " + line);
                 String note = line;
                 line = scanner.nextLine();
                 line = scanner.nextLine();
@@ -202,14 +204,14 @@ public class Updater extends Thread {
                     //line = scanner.nextLine(); did it above...
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    System.out.println("Stunden: " + line);
+                    if(DEBUG) System.out.println("Stunden: " + line);
                     String newHour = line;
                     //Raum
                     line = scanner.nextLine();
                     line = line.replace("&nbsp;", " ");
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    System.out.println("Raum: " + line);
+                    if(DEBUG) System.out.println("Raum: " + line);
                     String newRoom = line;
                     //Lehrer
                     line = scanner.nextLine();
@@ -218,21 +220,21 @@ public class Updater extends Thread {
                     line = line.replace("&auml;", "ä");
                     line = line.replace("<td style='font-weight: bold; padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    System.out.println("Lehrer: " + line);
+                    if(DEBUG) System.out.println("Lehrer: " + line);
                     String newTeacher = line;
                     //Fach
                     line = scanner.nextLine();
                     line = line.replace("&nbsp;", " ");
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    System.out.println("Fach: " + line);
+                    if(DEBUG) System.out.println("Fach: " + line);
                     String newSubject = line;
                     //Grund
                     line = scanner.nextLine();
                     line = line.replace("&nbsp;", " ");
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td></tr>", "");
-                    System.out.println("Grund: " + line);
+                    if(DEBUG) System.out.println("Grund: " + line);
 
                     //Adding entry full
                     VertretungsEntry entry = new VertretungsEntry(LocalDateTime.now(),
@@ -281,7 +283,7 @@ public class Updater extends Thread {
 
                 //LocalDate.parse(tmp, representationDateFormatter);
                 representationDate = LocalDate.parse(tmp, representationDateFormatter);
-                System.out.println("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
+                if(DEBUG) System.out.println("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
 
                 line = line.split(": ")[1];
 
@@ -315,7 +317,7 @@ public class Updater extends Thread {
 
         //LocalDate.parse(tmp, representationDateFormatter);
         representationDate = LocalDate.parse(tmp, representationDateFormatter);
-        System.out.println("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
+        if(DEBUG) System.out.println("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
 
         line = line.split(": ")[1];
 
@@ -514,7 +516,7 @@ public class Updater extends Thread {
                 String tmp = line.split(" - ")[0];
 
                 LocalDate.parse(tmp, representationDateFormatter);
-                System.out.println("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
+                if(DEBUG) System.out.println("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
 
                 line = line.split(": ")[1];
 
