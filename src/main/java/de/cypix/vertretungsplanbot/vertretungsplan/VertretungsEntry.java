@@ -4,8 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class VertretungsEntry implements Comparable<VertretungsEntry>{
+public class VertretungsEntry implements Comparable<VertretungsEntry> {
     private int entryId;
     private LocalDateTime registrationTimeStamp;
     private LocalDateTime lastRefreshTimeStamp;
@@ -23,7 +24,7 @@ public class VertretungsEntry implements Comparable<VertretungsEntry>{
 
     public VertretungsEntry(int entryId, LocalDateTime registrationTimeStamp, LocalDateTime lastRefreshTimeStamp, LocalDate representationDate, String className, String defaultHour, String defaultRoom, String defaultTeacher, String defaultSubject, String note, String newHour, String newRoom, String newTeacher, String newSubject) {
         this.entryId = entryId;
-        this.registrationTimeStamp = registrationTimeStamp;
+        this.registrationTimeStamp = LocalDateTime.parse(registrationTimeStamp.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")), DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
         this.lastRefreshTimeStamp = lastRefreshTimeStamp;
         this.representationDate = representationDate;
         this.className = className;
@@ -39,7 +40,7 @@ public class VertretungsEntry implements Comparable<VertretungsEntry>{
     }
 
     public VertretungsEntry(LocalDateTime registrationTimeStamp, LocalDateTime lastRefreshTimeStamp, LocalDate representationDate, String className, String defaultHour, String defaultRoom, String defaultTeacher, String defaultSubject, String note, String newHour, String newRoom, String newTeacher, String newSubject) {
-        this.registrationTimeStamp = registrationTimeStamp;
+        this.registrationTimeStamp = LocalDateTime.parse(registrationTimeStamp.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")), DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
         this.lastRefreshTimeStamp = lastRefreshTimeStamp;
         this.representationDate = representationDate;
         this.className = className;
@@ -55,7 +56,7 @@ public class VertretungsEntry implements Comparable<VertretungsEntry>{
     }
 
     public VertretungsEntry(LocalDateTime registrationTimeStamp, LocalDateTime lastRefreshTimeStamp, LocalDate representationDate, String className, String defaultHour, String defaultRoom, String defaultTeacher, String defaultSubject, String note) {
-        this.registrationTimeStamp = registrationTimeStamp;
+        this.registrationTimeStamp = LocalDateTime.parse(registrationTimeStamp.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")), DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
         this.lastRefreshTimeStamp = lastRefreshTimeStamp;
         this.representationDate = representationDate;
         this.className = className;
@@ -103,22 +104,37 @@ public class VertretungsEntry implements Comparable<VertretungsEntry>{
     }
 
     public String getNote() {
+        if (note.equals("") || note.equals(" ") || note.equals("..")) {
+            return null;
+        }
         return note;
     }
 
     public String getNewHour() {
+        if (newHour.equals("") || newHour.equals(" ") || newHour.equals("..")) {
+            return null;
+        }
         return newHour;
     }
 
     public String getNewRoom() {
+        if (newRoom.equals("") || newRoom.equals(" ") || newRoom.equals("..")) {
+            return null;
+        }
         return newRoom;
     }
 
     public String getNewTeacher() {
+        if (newTeacher.equals("") || newTeacher.equals(" ") || newTeacher.equals("..")) {
+            return null;
+        }
         return newTeacher;
     }
 
     public String getNewSubject() {
+        if (newSubject.equals("") || newSubject.equals(" ") || newSubject.equals("..")) {
+            return null;
+        }
         return newSubject;
     }
 
@@ -130,21 +146,50 @@ public class VertretungsEntry implements Comparable<VertretungsEntry>{
      */
     @Override
     public int compareTo(@NotNull VertretungsEntry o) {
-        boolean defaultSame = false;
-        //Hopefully unique identification
-        if(getRepresentationDate().isEqual(o.getRepresentationDate())&&
-                getClassName().equals(o.getClassName())&&
-                getDefaultHour().equals(o.getDefaultHour())&&
-                getDefaultRoom().equals(o.getDefaultRoom()))
-            defaultSame = true;
-        if(defaultSame && getNote().equals(o.getNote())&&
-                getNewHour().equals(o.getNewHour())&&
-                getNewRoom().equals(o.getNewRoom())&&
-                getNewTeacher().equals(o.getNewTeacher())&&
-                getNewSubject().equals(o.getNewSubject())){
+        boolean defaultSame = getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                .equals(o.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))) &&
+                getClassName().replace(" ", "").equals(o.getClassName().replace(" ", "")) &&
+                getDefaultHour().replace(" ", "").equals(o.getDefaultHour().replace(" ", "")) &&
+                getDefaultRoom().replace(" ", "").equals(o.getDefaultRoom().replace(" ", ""));
+/*        System.out.println(getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                +" equals "+(o.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))) +"\n && "+
+                getClassName().replace(" ", "")+" equals "+(o.getClassName().replace(" ", "")) +"\n && "+
+                getDefaultHour().replace(" ", "")+" equals "+(o.getDefaultHour().replace(" ", "")) +"\n && "+
+                getDefaultRoom().replace(" ", "")+" equals "+(o.getDefaultRoom().replace(" ", ""))+"====> "+defaultSame+"\n\n");
+        *///Hopefully unique identification
+        if (defaultSame && (getNote() != null && o.getNote() != null && getNote().equals(o.getNote()))) {
+            if (!(getNewHour() != null && o.getNewHour() != null && getNewHour().equals(o.getNewHour())))
+                return 2;
+            if (!(getNewRoom() != null && o.getNewRoom() != null && getNewRoom().equals(o.getNewRoom())))
+                return 2;
+            if (!(getNewTeacher() != null && o.getNewTeacher() != null && getNewTeacher().equals(o.getNewTeacher())))
+                return 2;
+            if (!(getNewSubject() != null && o.getNewSubject() != null && getNewSubject().equals(o.getNewSubject())))
+                return 2;
+
             return 0;
-        }else if(defaultSame){
+        } else if (defaultSame) {
             return 2;
-        }else return 1;
+        } else return 1;
+    }
+
+    @Override
+    public String toString() {
+        return "VertretungsEntry{" +
+                "entryId=" + entryId +
+                ", registrationTimeStamp=" + registrationTimeStamp +
+                ", lastRefreshTimeStamp=" + lastRefreshTimeStamp +
+                ", representationDate=" + representationDate +
+                ", className='" + className + '\'' +
+                ", defaultHour='" + defaultHour + '\'' +
+                ", defaultRoom='" + defaultRoom + '\'' +
+                ", defaultTeacher='" + defaultTeacher + '\'' +
+                ", defaultSubject='" + defaultSubject + '\'' +
+                ", note='" + note + '\'' +
+                ", newHour='" + newHour + '\'' +
+                ", newRoom='" + newRoom + '\'' +
+                ", newTeacher='" + newTeacher + '\'' +
+                ", newSubject='" + newSubject + '\'' +
+                '}';
     }
 }
