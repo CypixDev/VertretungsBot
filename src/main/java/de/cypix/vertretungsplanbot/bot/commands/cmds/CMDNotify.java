@@ -9,6 +9,8 @@ import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 
+import java.time.format.DateTimeFormatter;
+
 public class CMDNotify implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
@@ -19,7 +21,12 @@ public class CMDNotify implements TelegramCommand {
 
             //send all relevant entries
             for (VertretungsEntry allRelevantEntriesByClass : SQLManager.getAllRelevantEntriesByClass(args[1])) {
-                VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Änderung für: "+allRelevantEntriesByClass.getDefaultSubject()));
+                VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(),
+                        "Neuer eintrag Für den " + allRelevantEntriesByClass.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
+                                "Klasse: " + allRelevantEntriesByClass.getClassName() + "\n" +
+                                "Stunde: " + allRelevantEntriesByClass.getDefaultHour() + "\n" +
+                                "Fach: " + allRelevantEntriesByClass.getDefaultSubject() + "\n" +
+                                "Anmerkung: " + allRelevantEntriesByClass.getNote()));
             }
         }else {
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Das hast du sau mäßig verkackt!"));

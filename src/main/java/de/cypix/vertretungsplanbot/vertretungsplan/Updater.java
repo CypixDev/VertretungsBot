@@ -55,18 +55,22 @@ public class Updater extends Thread {
                                         for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                             VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass, "Änderung in "+newEntry.getNewSubject()+" und so weiter...."));
                                         }
-                                        break;
-                                }
-                            }
-                            if(!exist){
-                                SQLManager.insertNewEntry(newEntry);
-                                for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
-                                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass, "Änderung in "+newEntry.getNewSubject()+" und so weiter...."));
-                                }
+
+                                         */
+                                    break;
                             }
                         }
-
-
+                        if (!exist) {
+                            SQLManager.insertNewEntry(newEntry);
+                            for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
+                                VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,
+                                        "Neuer eintrag Für den " + newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
+                                                "Klasse: " + newEntry.getClassName() + "\n" +
+                                                "Stunde: " + newEntry.getDefaultHour() + "\n" +
+                                                "Fach: " + newEntry.getDefaultSubject() + "\n" +
+                                                "Anmerkung: " + newEntry.getNote()));
+                            }
+                        }
                     }
 
                 } catch (IOException e) {
