@@ -66,7 +66,7 @@ public class SQLConnector {
                     "default_room CHAR(4) NOT NULL, " +
                     "default_teacher VARCHAR(50) NOT NULL, " +
                     "default_subject CHAR(4) NOT NULL, " +
-                    "note VARCHAR(50) NOT NULL, " +
+                    "note VARCHAR(50), " +
                     "new_hour CHAR(6), " +
                     "new_room CHAR(4), " +
                     "new_teacher VARCHAR(50), " +
