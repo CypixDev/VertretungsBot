@@ -22,10 +22,17 @@ import java.util.List;
 public class CMDStart implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
-        VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Hallo!!"));
-        VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Wenn du für Vertretungen regestrieren willst Tippe: /notify <KLASSE>\n" +
-                "Zum Beispiel:\n /notify di91"));
-        SQLManager.insertNewUser(chat.id(), user.firstName(), user.lastName());
+        if(!SQLManager.isRegistered(chat.id())){
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Hallo!!"));
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Wenn du für Vertretungen regestrieren willst Tippe: /notify <KLASSE>\n" +
+                    "Zum Beispiel:\n /notify di91"));
+            SQLManager.insertNewUser(chat.id(), user.firstName(), user.lastName());
+        }else{
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Du bist bereits regestriert \n" +
+                    "Wenn du hilfe brauchst, benutzte /help"));
+        }
+
+        /*Test later....
         SendInvoice sendInvoice = new SendInvoice(chat.id(), "title", "desc", "my_payload",
                 "284685063:TEST:MmUzODUxODNiZGFj", "", "EUR", new LabeledPrice("label", 200))
                 .needPhoneNumber(true)
@@ -36,9 +43,11 @@ public class CMDStart implements TelegramCommand {
         SendResponse response = VertretungsPlanBot.getBot().execute(sendInvoice);
         answerShippingQuery();
 
+         */
+
     }
     public void answerShippingQuery() {
-        ShippingQuery shippingQuery = getLastShippingQuery();
+        /*ShippingQuery shippingQuery = getLastShippingQuery();
         String shippingQueryId = shippingQuery != null ? shippingQuery.id() : "invalid_query_id";
         BaseResponse response = VertretungsPlanBot.getBot().execute(new AnswerShippingQuery(shippingQueryId,
                 new ShippingOption("1", "VNPT", new LabeledPrice("delivery", 100), new LabeledPrice("tips", 50)),
@@ -52,6 +61,8 @@ public class CMDStart implements TelegramCommand {
             //assertEquals(400, response.errorCode());
             //assertEquals("Bad Request: QUERY_ID_INVALID", response.description());
         }
+        */
+
     }
 
     private ShippingQuery getLastShippingQuery() {
