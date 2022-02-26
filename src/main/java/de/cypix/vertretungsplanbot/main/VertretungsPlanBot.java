@@ -3,6 +3,8 @@ package de.cypix.vertretungsplanbot.main;
 import com.pengrad.telegrambot.TelegramBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyDelete;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyOpenOverview;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyOverview;
 import de.cypix.vertretungsplanbot.bot.listener.BotListener;
 import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
@@ -69,7 +71,6 @@ public class VertretungsPlanBot {
     public void startBot(String token){
         bot = new TelegramBot(token);
         bot.setUpdatesListener(new BotListener());
-
     }
 
     private static void registerCommands() {
@@ -82,6 +83,8 @@ public class VertretungsPlanBot {
 
     private static void registerKeyBoardCallBacks(){
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOverview());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyDelete());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOpenOverview());
     }
 
 

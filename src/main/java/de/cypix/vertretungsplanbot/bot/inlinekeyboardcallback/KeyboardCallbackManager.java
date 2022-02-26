@@ -1,6 +1,7 @@
 package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback;
 
 import com.pengrad.telegrambot.model.Chat;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 
 import java.util.HashMap;
@@ -18,10 +19,10 @@ public class KeyboardCallbackManager {
         this.callbacks.put(keyboardCallback, keyboardCallbackType);
     }
     //returns false if command not exists
-    public boolean handle(KeyboardCallbackType callbackType, String key, User user, Chat chat, HashMap<String, String> data){
+    public boolean handle(KeyboardCallbackType callbackType, String key, Update update, Chat chat, HashMap<String, String> data){
         for (Map.Entry<KeyboardCallback, KeyboardCallbackType> entry : callbacks.entrySet()) {
             if(entry.getValue().equals(callbackType)){
-                if(entry.getKey().handleCallBack(key, user, chat, data))
+                if(entry.getKey().handleCallBack(key, update, chat, data))
                     return true;
             }
         }

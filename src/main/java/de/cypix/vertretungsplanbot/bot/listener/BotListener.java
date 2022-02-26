@@ -47,13 +47,18 @@ public class BotListener implements UpdatesListener {
                         data.put(splitData[i].split("=")[0], splitData[i].split("=")[1]);
                     }
                     if (SQLManager.isRegistered(update.callbackQuery().from().id())) {
-                        if (!VertretungsPlanBot.getKeyboardCallbackManager().handle(KeyboardCallbackType.valueOf(Integer.parseInt(data.get("callbackType"))), data.get("key"), update.callbackQuery().from(), update.callbackQuery().message().chat(), data)) {
-                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Callback nicht bekannt!"));
+                        if (!VertretungsPlanBot.getKeyboardCallbackManager().handle(
+                                KeyboardCallbackType.valueOf(Integer.parseInt(data.get("callbackType"))),
+                                data.get("key"),
+                                update,
+                                update.callbackQuery().message().chat(),
+                                data)) {
+                            VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Callback nicht bekannt!"));
                         }
                         //Eigentlich unnötig glaube ich....
                     } else
-                        VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Bitte regestriere dich zuerst mit /start"));
-                }
+                        VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Bitte regestriere dich zuerst mit /start"));
+                }else System.out.println("Called unknown callback, Data:"+update.callbackQuery().data());
             }else{
                 System.out.println("Unknown update...");
             }

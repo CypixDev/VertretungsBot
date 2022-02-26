@@ -19,7 +19,6 @@ public class CMDNotifyList implements TelegramCommand {
         for (String className : SQLManager.getAllNotifiesByChatId(chat.id())) {
             inlineKeyboard.addRow(new InlineKeyboardButton(className).callbackData(
                     new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "overview").addData("class", className).build()));
-            System.out.println("....");
         }
 
         VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Hier die Liste deiner Notifications:").replyMarkup(inlineKeyboard));

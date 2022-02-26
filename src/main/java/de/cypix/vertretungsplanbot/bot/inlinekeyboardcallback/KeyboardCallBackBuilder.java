@@ -32,4 +32,8 @@ public class KeyboardCallBackBuilder {
         return str.toString();
     }
 
+    @Override
+    public String toString() {
+        return build();
+    }
 }

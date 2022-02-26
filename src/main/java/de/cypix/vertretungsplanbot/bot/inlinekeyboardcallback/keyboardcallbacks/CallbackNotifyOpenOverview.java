@@ -11,37 +11,32 @@ import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallBackBu
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallback;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
+import de.cypix.vertretungsplanbot.sql.SQLManager;
 
 import java.util.HashMap;
 
-public class CallbackNotifyOverview implements KeyboardCallback {
-
-
+public class CallbackNotifyOpenOverview implements KeyboardCallback {
     @Override
     public boolean handleCallBack(String key, Update update, Chat chat, HashMap<String, String> data) {
-        if(!getKey().equalsIgnoreCase(key)) return false;
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        inlineKeyboard.addRow(
-                new InlineKeyboardButton("Zurück").callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "openOverview").build()),
-                new InlineKeyboardButton("Löschen")
-                .callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "delete")
-                        .addData("class", data.get("class"))
-                        .build()));
-        inlineKeyboard.addRow(new InlineKeyboardButton("Statistiken").callbackData("__"));
 
-        EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Übersicht für "+data.get("class"))
+        for (String className : SQLManager.getAllNotifiesByChatId(chat.id())) {
+            inlineKeyboard.addRow(new InlineKeyboardButton(className).callbackData(
+                    new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "overview").addData("class", className).build()));
+        }
+
+        EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Hier die Liste deiner Notifications:")
                 .parseMode(ParseMode.HTML)
                 .disableWebPagePreview(true)
                 .replyMarkup(inlineKeyboard);
 
-        BaseResponse response = VertretungsPlanBot.getBot().execute(editMessageText);
+        VertretungsPlanBot.getBot().execute(editMessageText);
 
         return true;
     }
 
     @Override
     public String getKey() {
-        return "overview";
+        return "openOverview";
     }
 }

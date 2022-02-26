@@ -67,6 +67,10 @@ public class SQLManager {
         return getVertretungsEntries(rs);
     }
 
+    public static void deleteNotification(long chatId, String className){
+        VertretungsPlanBot.getSqlConnector().executeUpdate("DELETE FROM notification WHERE user_id=(SELECT user_id FROM user WHERE chat_id="+chatId+") AND class='"+className+"';");
+    }
+
     @NotNull
     private static List<VertretungsEntry> getVertretungsEntries(ResultSet rs) {
         List<VertretungsEntry> list = new ArrayList<>();
