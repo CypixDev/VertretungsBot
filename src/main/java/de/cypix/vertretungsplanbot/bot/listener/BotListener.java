@@ -27,13 +27,13 @@ public class BotListener implements UpdatesListener {
                 }
 
                 //call command
-                if (SQLManager.isRegistered(update.message().chat().id())) {
+                if (SQLManager.isRegistered(update.message().chat().id()) || args[0].equalsIgnoreCase("/start")) {
                     if (!VertretungsPlanBot.getCommandManager().perform(args[0], update.message().from(), update.message().chat(), update.message(), args)) {
                         VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Befehl nicht bekannt!"));
                     }
                     //Eigentlich unnötig glaube ich....
                 } else
-                    VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Bitte regestriere dich zuerst mit /start"));
+                    VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Bitte registriere dich zuerst mit /start"));
             }else if(update.callbackQuery() != null){
                 //It's probably a callback
                 if(update.callbackQuery().data().startsWith("type=keyboard;")){
