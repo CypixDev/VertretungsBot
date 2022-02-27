@@ -63,7 +63,7 @@ public class SQLManager {
 
     public static List<VertretungsEntry> getAllRelevantEntries() {
         //TODO: Check if it's properly working
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE representation_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)");
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE representation_date >= CURRENT_DATE");
         return getVertretungsEntries(rs);
     }
 

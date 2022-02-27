@@ -27,14 +27,15 @@ public class Updater extends Thread {
     public void run() {
         try {
             while (keepRunning()) {
-                try {
-                    URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
-                    Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
+                if(LocalDateTime.now().getHour() < 23 && LocalDateTime.now().getHour() >= 1){
+                    try {
+                        URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
+                        Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
 
-                    if(DEBUG) System.out.println("Vergleiche: "
-                            + getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) +
-                            " und "
-                            + SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
+                        if(DEBUG) System.out.println("Vergleiche: "
+                                + getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) +
+                                " und "
+                                + SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
                     /*if(!getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                             .equals(SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))){
                         //Updating database....
@@ -43,34 +44,34 @@ public class Updater extends Thread {
                         List<VertretungsEntry> newEntries = filter(scanner);
                         List<VertretungsEntry> oldEntries = SQLManager.getAllRelevantEntries();
 
-                    //TODO: check if something is deleted
-                    if (newEntries.size() == oldEntries.size()) {
-                        System.out.println("Anzahl einträge gleich geblieben");
-                    } else if (newEntries.size() > oldEntries.size()) {
-                        System.out.println("Es gibt neue einträge!");
-                    } else {
-                        System.out.println("Es sind weniger einträge...");
-                    }
+                        //TODO: check if something is deleted
+                        if (newEntries.size() == oldEntries.size()) {
+                            System.out.println("Anzahl einträge gleich geblieben");
+                        } else if (newEntries.size() > oldEntries.size()) {
+                            System.out.println("Es gibt neue einträge!");
+                        } else {
+                            System.out.println("Es sind weniger einträge...");
+                        }
 
-                    for (VertretungsEntry newEntry : newEntries) {
-                        //If none fits it is probably a new entry
-                        boolean exist = false;
-                        for (VertretungsEntry oldEntry : oldEntries) {
-                            switch (newEntry.compareTo(oldEntry)) {
+                        for (VertretungsEntry newEntry : newEntries) {
+                            //If none fits it is probably a new entry
+                            boolean exist = false;
+                            for (VertretungsEntry oldEntry : oldEntries) {
+                                switch (newEntry.compareTo(oldEntry)) {
                                         /*
                                             0 means same
                                             1 absolut different
                                             2 defaults same
                                          */
-                                case 0: //same
-                                    exist = true;
-                                    //Nothing to do....
-                                    break;
-                                case 1: //different
-                                    //could be other one or not existing
-                                    //Nothing to do....
-                                    break;
-                                case 2://Aktuallisieren
+                                    case 0: //same
+                                        exist = true;
+                                        //Nothing to do....
+                                        break;
+                                    case 1: //different
+                                        //could be other one or not existing
+                                        //Nothing to do....
+                                        break;
+                                    case 2://Aktuallisieren
                                     /*TODO: check....
                                     if(!getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                                             .equals(SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))){
@@ -79,40 +80,41 @@ public class Updater extends Thread {
                                     System.out.println(oldEntry.toString());
                                     System.out.println(newEntry.toString());
                                     System.out.println();*/
-                                    exist = true;
-                                    SQLManager.updateEntry(newEntry);
-                                    if(DEBUG) System.out.println("entry updated!");
+                                        exist = true;
+                                        SQLManager.updateEntry(newEntry);
+                                        if(DEBUG) System.out.println("entry updated!");
                                         /*for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                             VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass, "Änderung in "+newEntry.getNewSubject()+" und so weiter...."));
                                         }
 
                                          */
-                                    break;
+                                        break;
+                                }
+                            }
+                            if (!exist) {
+                                SQLManager.insertNewEntry(newEntry);
+                                for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
+                                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,
+                                            "Neuer eintrag für den " + newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
+                                                    "Klasse: " + newEntry.getClassName() + "\n" +
+                                                    "Stunde: " + newEntry.getDefaultHour() + "\n" +
+                                                    "Fach: " + newEntry.getDefaultSubject() + "\n" +
+                                                    "Anmerkung: " + newEntry.getNote()));
+                                }
                             }
                         }
-                        if (!exist) {
-                            SQLManager.insertNewEntry(newEntry);
-                            for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
-                                VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,
-                                        "Neuer eintrag Für den " + newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
-                                                "Klasse: " + newEntry.getClassName() + "\n" +
-                                                "Stunde: " + newEntry.getDefaultHour() + "\n" +
-                                                "Fach: " + newEntry.getDefaultSubject() + "\n" +
-                                                "Anmerkung: " + newEntry.getNote()));
-                            }
-                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    long chatId = 259699517; //Chat id von Pius
+
+
+                    Thread.sleep(60000); //second
+
+                    //Vergleiche: 23.02.2022 11:03:40 und 23.02.2022 13:11:52
                 }
-
-                long chatId = 259699517; //Chat id von Pius
-
-
-                Thread.sleep(60000); //second
-
-                //Vergleiche: 23.02.2022 11:03:40 und 23.02.2022 13:11:52
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
