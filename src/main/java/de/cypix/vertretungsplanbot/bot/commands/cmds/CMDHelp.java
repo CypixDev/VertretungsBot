@@ -16,6 +16,8 @@ public class CMDHelp implements TelegramCommand {
                 "➡️ Benutzte /notify um Benachrichtigungen zu aktivieren\n" +
                 "➡️ Wenn du /notifylist benutzt, kannst du alle Benachrichtigungen sehen und bearbeiten\n" +
                 "➡️ Falls du alle gespeicherten personenbezogenen Daten haben willst, verwende /getalldata\n" +
-                "➡️ Mit /status bekommst du den Status der verschiedenen Systeme"));
+                "➡️ Mit /status bekommst du den Status der verschiedenen Systeme\n\n" +
+                "Für eine kleine Spende: \npaypal.me/piusko"));
+
     }
 }
