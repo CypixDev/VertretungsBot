@@ -3,9 +3,7 @@ package de.cypix.vertretungsplanbot.main;
 import com.pengrad.telegrambot.TelegramBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
-import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyDelete;
-import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyOpenOverview;
-import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyOverview;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.*;
 import de.cypix.vertretungsplanbot.bot.listener.BotListener;
 import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
 import de.cypix.vertretungsplanbot.bot.commands.cmds.*;
@@ -79,12 +77,17 @@ public class VertretungsPlanBot {
         commandManager.registerCommand("/start", new CMDStart());
         commandManager.registerCommand("/notify", new CMDNotify());
         commandManager.registerCommand("/notifylist", new CMDNotifyList());
+        commandManager.registerCommand("/status", new CMDStatus());
+        commandManager.registerCommand("/getalldata", new CMDGetAllData());
     }
 
     private static void registerKeyBoardCallBacks(){
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOverview());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyDelete());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOpenOverview());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyAddClass());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyAddClassFinish());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOpenAddOverview());
     }
 
 
