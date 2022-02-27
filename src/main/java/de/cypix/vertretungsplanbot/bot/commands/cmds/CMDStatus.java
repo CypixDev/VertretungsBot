@@ -10,11 +10,11 @@ import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 public class CMDStatus implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
-        VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Status der Systeme:" +
-                "" +
+        VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Status der Systeme:\n" +
+                "\n" +
                 "Telegrambot ✅\n" +
                 "Datenbank "+(VertretungsPlanBot.getSqlConnector().isConnected() ? "✅" : "❌")+"\n" +
-                "Discord "+"❌\n" +
-                "Signal "+"❌\n"));
+                "Discord "+"❌ (to do)\n" +
+                "Signal "+"❌ (to do)\n"));
     }
 }
