@@ -14,19 +14,6 @@ import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 public class CMDNotify implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
-        //VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "YESS! Du bist also in der " + args[1]));
-        //TODO: class exists?
-        //SQLManager.insertNewNotification(chat.id(), args[1]);
-                /*
-            Klassen:
-            DI
-            AD
-            AV
-            AW
-            CE
-            CI
-            DW
-             */
         String[] classes = {"AA", "AB", "AD", "AE", "AF", "AG", "AI", "AK", "AM", "AP", "AV", "AW", "AZ",
                 "B1", "B2", "CE", "CI", "CM", "DI", "DW", "EE", "EM"};
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
