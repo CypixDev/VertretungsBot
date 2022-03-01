@@ -16,17 +16,45 @@ import java.util.HashMap;
 
 public class CallbackNotifyAddClass implements KeyboardCallback {
 
-    private static HashMap<String, String[]> classes;
+    private final HashMap<String, String[]> classes;
 
     public CallbackNotifyAddClass() {
         classes = new HashMap<>();
+        classes.put("AA", new String[]{"01", "11", "81", "91"});
+        classes.put("AB", new String[]{"01", "02", "11", "12", "81", "91"});
+        classes.put("AD", new String[]{"01", "02", "11", "12", "91", "92"});
+        classes.put("AE", new String[]{"01", "11", "81", "91"});
+        classes.put("AF", new String[]{"01", "11"});
+        classes.put("AG", new String[]{"01", "11", "91"});
+        classes.put("AI", new String[]{"01", "11", "81", "91"});
+        classes.put("AK", new String[]{"01", "11", "81", "91"});
+        classes.put("AM", new String[]{"01", "11", "81", "91"});
+        classes.put("AP", new String[]{"01", "11", "81", "91"});
+        classes.put("AV", new String[]{"11", "13"});
+        classes.put("AW", new String[]{"01", "11", "81", "91"});
+        classes.put("AZ", new String[]{"01", "02", "11", "12", "81", "82", "91", "92"});
+        classes.put("B1", new String[]{"M11"});
+        classes.put("B2", new String[]{"E11", "M11"});
+        classes.put("CE", new String[]{"01", "11"});
+        classes.put("CI", new String[]{"01", "11", "12", "91"});
+        classes.put("CM", new String[]{"01", "11"});
         classes.put("DI", new String[]{"91", "01", "11"});
+        classes.put("DW", new String[]{"01", "11"});
+        classes.put("EE", new String[]{"01", "11", "81", "91"});
+        classes.put("EM", new String[]{"01", "11", "81", "91"});
+
+
+
+
+
+
+/*        classes.put("DI", new String[]{"91", "01", "11"});
         classes.put("AD", new String[]{"91", "92", "11"});
         classes.put("AV", new String[]{"13"});
         classes.put("AW", new String[]{"11", "91"});
         classes.put("DW", new String[]{"01", "11"});
         classes.put("CE", new String[]{"01", "91"});
-        classes.put("CI", new String[]{"01", "91"});
+        classes.put("CI", new String[]{"01", "91"});*/
 
     }
 
