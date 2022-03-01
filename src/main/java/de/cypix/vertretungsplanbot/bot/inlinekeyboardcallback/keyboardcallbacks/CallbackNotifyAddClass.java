@@ -12,11 +12,13 @@ import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackTy
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class CallbackNotifyAddClass implements KeyboardCallback {
 
-    private static final Logger logger = Logger.getLogger( CallbackNotifyAddClass.class );
+    private static final Logger logger = Logger.getLogger(CallbackNotifyAddClass.class);
 
     private final HashMap<String, String[]> classes;
 
@@ -49,52 +51,54 @@ public class CallbackNotifyAddClass implements KeyboardCallback {
 
     @Override
     public boolean handleCallBack(String key, Update update, Chat chat, HashMap<String, String> data) {
-        if(!getKey().equalsIgnoreCase(key)) return false;
+        if (!getKey().equalsIgnoreCase(key)) return false;
         String educationProgram = data.get("educationProgram");
 
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
 
-        switch(classes.get(educationProgram).length){
+        switch (classes.get(educationProgram).length) {
 
             case 1:
             case 2:
             case 3:
+                InlineKeyboardButton[] buttons = new InlineKeyboardButton[classes.get(educationProgram).length];
                 for (int i = 0; i < classes.get(educationProgram).length; i++) {
-                    inlineKeyboard.addRow(new InlineKeyboardButton(educationProgram+classes.get(educationProgram)[i]).callbackData(
+                    buttons[i] = new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[i]).callbackData(
                             new KeyboardCallBackBuilder(
                                     KeyboardCallbackType.NOTIFY, "addClassFinish")
-                                    .addData("class", educationProgram+classes.get(educationProgram)[i])
-                                    .build()));
+                                    .addData("class", educationProgram + classes.get(educationProgram)[i])
+                                    .build());
                 }
+                inlineKeyboard.addRow(buttons);
                 break;
 
             case 4:
             case 6:
             case 8:
-                for (int i = 0; i < classes.get(educationProgram).length; i+=2) {
-                    inlineKeyboard.addRow(new InlineKeyboardButton(educationProgram+classes.get(educationProgram)[i]).callbackData(
-                            new KeyboardCallBackBuilder(
-                                    KeyboardCallbackType.NOTIFY, "addClassFinish")
-                                    .addData("class", educationProgram+classes.get(educationProgram)[i])
-                                    .build()), new InlineKeyboardButton(educationProgram+classes.get(educationProgram)[i+1]).callbackData(
-                            new KeyboardCallBackBuilder(
-                                    KeyboardCallbackType.NOTIFY, "addClassFinish")
-                                    .addData("class", educationProgram+classes.get(educationProgram)[i+1])
-                                    .build()));
+                for (int i = 0; i < classes.get(educationProgram).length; i += 2) {
+                    inlineKeyboard.addRow(
+                            new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[0]).callbackData(
+                                    new KeyboardCallBackBuilder(
+                                            KeyboardCallbackType.NOTIFY, "addClassFinish")
+                                            .addData("class", educationProgram + classes.get(educationProgram)[0])
+                                            .build()),
+                            new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[1]).callbackData(
+                                    new KeyboardCallBackBuilder(
+                                            KeyboardCallbackType.NOTIFY, "addClassFinish")
+                                            .addData("class", educationProgram + classes.get(educationProgram)[1])
+                                            .build()));
                 }
+
                 break;
             default:
-                logger.error("Show all classes faild because length is: "+classes.get(educationProgram).length);
+                logger.error("Show all classes faild because length is: " + classes.get(educationProgram).length);
                 break;
 
 
-
         }
 
-        for (int i = 0; i < classes.get(educationProgram).length; i++) {
-            inlineKeyboard.addRow(new InlineKeyboardButton(educationProgram+classes.get(educationProgram)[i]).callbackData(
-                    new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClassFinish").addData("class", educationProgram+classes.get(educationProgram)[i]).build()));
-        }
+        inlineKeyboard.addRow(new InlineKeyboardButton("Zurück")
+                .callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "openAddOverview").build()));
 
         EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Bitte wähle deine Klasse:")
                 .parseMode(ParseMode.HTML)

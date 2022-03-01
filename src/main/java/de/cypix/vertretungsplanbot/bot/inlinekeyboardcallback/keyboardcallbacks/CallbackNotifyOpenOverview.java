@@ -6,7 +6,6 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.EditMessageText;
-import com.pengrad.telegrambot.response.BaseResponse;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallBackBuilder;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallback;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
