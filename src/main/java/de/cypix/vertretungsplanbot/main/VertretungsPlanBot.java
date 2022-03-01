@@ -11,18 +11,15 @@ import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.console.ConsoleManager;
 import de.cypix.vertretungsplanbot.sql.SQLConnector;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
+import org.apache.log4j.DailyRollingFileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.xml.DOMConfigurator;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 public class VertretungsPlanBot {
 
@@ -35,7 +32,8 @@ public class VertretungsPlanBot {
     private static ConfigManager configManager;
     private static ConsoleManager consoleManager;
     private static Updater updater;
-    public static Logger logger;
+    private static Logger logger = Logger.getRootLogger();
+
 
     public static void main(String[] args) {
         setupLogger();
@@ -97,38 +95,17 @@ public class VertretungsPlanBot {
     }
 
     private static void setupLogger() {
-        logger = Logger.getLogger("Noyce");
-        FileHandler fh;
-        File file = new File("latest.log");
-        new File("log").mkdirs();
-        if(file.exists()){
-            try {
-                Path source = Paths.get("latest.log");
-                Path target = Paths.get("log/"+calcDate(System.currentTimeMillis())+".log");
-                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else System.out.println("Log file not exists!");
         try {
-
-
-            // This block configure the logger with handler and formatter
-            fh = new FileHandler("latest.log");
-            logger.addHandler(fh);
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            DOMConfigurator.configureAndWatch( "log4j.xml", 60*1000 );
+/*            PatternLayout layout = new PatternLayout( "%d{ISO8601} %-5p [%t] %c: %m%n" );
+            DailyRollingFileAppender fileAppender =
+                    new DailyRollingFileAppender( layout, "logs/MeineLogDatei.log", "'.'yyyy-MM-dd_HH-mm" );
+            logger.addAppender( fileAppender );
+            logger.setLevel( Level.ALL );
+            logger.*/
+        } catch( Exception ex ) {
+            System.out.println( ex );
         }
-    }
-    private static String calcDate(long milliseconds) {
-        SimpleDateFormat date_format = new SimpleDateFormat("yyy_MMM_dd_HH_mm");
-        Date resultDate = new Date(milliseconds);
-        return date_format.format(resultDate);
     }
 
 

@@ -2,6 +2,7 @@ package de.cypix.vertretungsplanbot.console;
 
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -9,6 +10,8 @@ import java.util.Scanner;
 public class ConsoleManager extends Thread{
 
     private Scanner scanner;
+
+    private static Logger logger = Logger.getLogger( ConsoleManager.class );
 
     @Override
     public void run() {
@@ -24,7 +27,8 @@ public class ConsoleManager extends Thread{
     private void startConsole() throws IOException {
         scanner = new Scanner(System.in);
 
-        System.out.println("Console is now ready to get commands....");
+        logger.info("Console scanner started successfully");
+
         while(scanner.hasNext()){
             handleConsoleInput(scanner.nextLine());
         }

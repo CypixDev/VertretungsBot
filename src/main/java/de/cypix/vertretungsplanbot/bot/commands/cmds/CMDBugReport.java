@@ -8,6 +8,6 @@ import de.cypix.vertretungsplanbot.bot.commands.TelegramCommand;
 public class CMDBugReport implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
-        chat.
+
     }
 }
