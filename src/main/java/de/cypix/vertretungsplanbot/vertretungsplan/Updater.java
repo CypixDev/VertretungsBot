@@ -96,7 +96,8 @@ public class Updater extends Thread {
                                 for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                     StringBuilder builder = new StringBuilder();
                                     builder.append("Neuer eintrag für den ")
-                                            .append(newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                                            .append(newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                                            .append("\n");
 
                                     builder.append("Klasse: ").append(newEntry.getClassName()).append("\n");
                                     builder.append("Stunde: ").append(newEntry.getDefaultHour()).append("\n");
