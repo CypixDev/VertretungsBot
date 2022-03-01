@@ -43,19 +43,6 @@ public class CallbackNotifyAddClass implements KeyboardCallback {
         classes.put("EE", new String[]{"01", "11", "81", "91"});
         classes.put("EM", new String[]{"01", "11", "81", "91"});
 
-
-
-
-
-
-/*        classes.put("DI", new String[]{"91", "01", "11"});
-        classes.put("AD", new String[]{"91", "92", "11"});
-        classes.put("AV", new String[]{"13"});
-        classes.put("AW", new String[]{"11", "91"});
-        classes.put("DW", new String[]{"01", "11"});
-        classes.put("CE", new String[]{"01", "91"});
-        classes.put("CI", new String[]{"01", "91"});*/
-
     }
 
     @Override
