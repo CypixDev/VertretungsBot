@@ -10,10 +10,6 @@ import de.cypix.vertretungsplanbot.bot.commands.TelegramCommand;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallBackBuilder;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
-import de.cypix.vertretungsplanbot.sql.SQLManager;
-import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
-
-import java.time.format.DateTimeFormatter;
 
 public class CMDNotify implements TelegramCommand {
     @Override
@@ -31,22 +27,27 @@ public class CMDNotify implements TelegramCommand {
             CI
             DW
              */
-        String[] classes = {"DI", "AD", "AV", "CE", "CI", "DW", "AW"};
+        String[] classes = {"AA", "AB", "AD", "AE", "AF", "AG", "AI", "AK", "AM", "AP", "AV", "AW", "AZ",
+                "B1", "B2", "CE", "CI", "CM", "DI", "DW", "EE", "EM"};
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        inlineKeyboard.addRow(new InlineKeyboardButton(classes[0]).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[0]).build()),
-                new InlineKeyboardButton(classes[1]).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[1]).build()),
-                new InlineKeyboardButton(classes[2]).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[2]).build()));
-        inlineKeyboard.addRow(new InlineKeyboardButton(classes[3]).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[3]).build()),
-                new InlineKeyboardButton(classes[4]).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[4]).build()),
-                new InlineKeyboardButton(classes[5]).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[5]).build()));
-        inlineKeyboard.addRow(new InlineKeyboardButton(classes[6]).callbackData(
-                new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[6]).build()));
+
+        for (int i = 0; i + 4 < classes.length; i += 4) {
+            inlineKeyboard.addRow(new InlineKeyboardButton(classes[i]).callbackData(
+                            new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[i]).build()),
+                    new InlineKeyboardButton(classes[i + 1]).callbackData(
+                            new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[i + 1]).build()),
+                    new InlineKeyboardButton(classes[i + 2]).callbackData(
+                            new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[i + 2]).build()),
+                    new InlineKeyboardButton(classes[i + 3]).callbackData(
+                            new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[i + 3]).build()));
+
+        }
+        inlineKeyboard.addRow(
+                new InlineKeyboardButton(classes[classes.length - 2]).callbackData(
+                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[classes.length - 2]).build()),
+                new InlineKeyboardButton(classes[classes.length - 1]).callbackData(
+                        new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "addClass").addData("educationProgram", classes[classes.length - 1]).build()));
+
 
         VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Bitte wähle einen Bildungsgang").replyMarkup(inlineKeyboard));
 
