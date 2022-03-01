@@ -13,6 +13,7 @@ public class CMDStatus implements TelegramCommand {
         VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Status der Systeme:\n" +
                 "\n" +
                 "Telegrambot ✅\n" +
+                "Updater "+(VertretungsPlanBot.getUpdater().isAlive() ? "✅" : "❌")+"\n" +
                 "Datenbank "+(VertretungsPlanBot.getSqlConnector().isConnected() ? "✅" : "❌")+"\n" +
                 "Discord "+"❌ (to do)\n" +
                 "Signal "+"❌ (to do)\n"));
