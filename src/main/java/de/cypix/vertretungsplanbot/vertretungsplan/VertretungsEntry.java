@@ -8,15 +8,15 @@ import java.time.format.DateTimeFormatter;
 
 public class VertretungsEntry implements Comparable<VertretungsEntry> {
     private int entryId;
-    private LocalDateTime registrationTimeStamp;
-    private LocalDateTime lastRefreshTimeStamp;
-    private LocalDate representationDate;
-    private String className;
-    private String defaultHour;
-    private String defaultRoom;
-    private String defaultTeacher;
-    private String defaultSubject;
-    private String note;
+    private final LocalDateTime registrationTimeStamp;
+    private final LocalDateTime lastRefreshTimeStamp;
+    private final LocalDate representationDate;
+    private final String className;
+    private final String defaultHour;
+    private final String defaultRoom;
+    private final String defaultTeacher;
+    private final String defaultSubject;
+    private final String note;
     private String newHour;
     private String newRoom;
     private String newTeacher;

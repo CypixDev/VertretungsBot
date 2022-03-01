@@ -7,7 +7,7 @@ import com.google.code.chatterbotapi.ChatterBotType;
 
 public class CleverBot {
 
-    private static ChatterBotFactory factory = new ChatterBotFactory();
+    private static final ChatterBotFactory factory = new ChatterBotFactory();
 
     private static ChatterBot bot1;
 
@@ -19,7 +19,7 @@ public class CleverBot {
         }
     }
 
-    private static ChatterBotSession cleverBotSession = bot1.createSession();
+    private static final ChatterBotSession cleverBotSession = bot1.createSession();
 
 
 

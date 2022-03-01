@@ -32,7 +32,7 @@ public class VertretungsPlanBot {
     private static ConfigManager configManager;
     private static ConsoleManager consoleManager;
     private static Updater updater;
-    private static Logger logger = Logger.getRootLogger();
+    private static final Logger logger = Logger.getRootLogger();
 
 
     public static void main(String[] args) {

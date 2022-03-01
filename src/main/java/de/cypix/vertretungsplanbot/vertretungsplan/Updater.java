@@ -21,7 +21,7 @@ public class Updater extends Thread {
     private static LocalDateTime lastRefreshTimeStamp = null;
     private static LocalDate representationDate = null;
 
-    private static boolean DEBUG = false;
+    private static final boolean DEBUG = false;
 
     @Override
     public void run() {

@@ -7,6 +7,6 @@ import com.pengrad.telegrambot.model.User;
 
 public interface TelegramCommand {
 
-    public void performCommand(User user, Chat chat, Message message, String[] args);
+    void performCommand(User user, Chat chat, Message message, String[] args);
 
 }

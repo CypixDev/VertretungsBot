@@ -9,9 +9,7 @@ import java.util.HashMap;
 public class CallbackNotifyOpenAddOverview implements KeyboardCallback {
     @Override
     public boolean handleCallBack(String key, Update update, Chat chat, HashMap<String, String> data) {
-        if(!getKey().equalsIgnoreCase(key)) return false;
-
-        return true;
+        return getKey().equalsIgnoreCase(key);
     }
 
     @Override

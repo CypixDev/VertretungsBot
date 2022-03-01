@@ -5,9 +5,9 @@ import java.util.Map;
 
 public class KeyboardCallBackBuilder {
 
-    private HashMap<String, String> data;
-    private KeyboardCallbackType keyboardCallbackType;
-    private String key;
+    private final HashMap<String, String> data;
+    private final KeyboardCallbackType keyboardCallbackType;
+    private final String key;
 
     public KeyboardCallBackBuilder(KeyboardCallbackType keyboardCallbackType, String key) {
         this.keyboardCallbackType = keyboardCallbackType;

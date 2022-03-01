@@ -11,7 +11,7 @@ public class ConsoleManager extends Thread{
 
     private Scanner scanner;
 
-    private static Logger logger = Logger.getLogger( ConsoleManager.class );
+    private static final Logger logger = Logger.getLogger( ConsoleManager.class );
 
     @Override
     public void run() {
