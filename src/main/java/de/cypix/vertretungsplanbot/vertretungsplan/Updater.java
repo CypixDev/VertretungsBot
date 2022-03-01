@@ -94,12 +94,26 @@ public class Updater extends Thread {
                             if (!exist) {
                                 SQLManager.insertNewEntry(newEntry);
                                 for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
-                                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,
-                                            "Neuer eintrag für den " + newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
-                                                    "Klasse: " + newEntry.getClassName() + "\n" +
-                                                    "Stunde: " + newEntry.getDefaultHour() + "\n" +
-                                                    "Fach: " + newEntry.getDefaultSubject() + "\n" +
-                                                    "Anmerkung: " + newEntry.getNote()));
+                                    StringBuilder builder = new StringBuilder();
+                                    builder.append("Neuer eintrag für den ")
+                                            .append(newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+
+                                    builder.append("Klasse: ").append(newEntry.getClassName()).append("\n");
+                                    builder.append("Stunde: ").append(newEntry.getDefaultHour()).append("\n");
+                                    builder.append("Fach: ").append(newEntry.getDefaultSubject()).append("\n");
+                                    if(newEntry.getNote() != null && !newEntry.getNote().equals("null"))
+                                        builder.append("Anmerkung: ").append(newEntry.getNote()).append("\n");
+                                    if(newEntry.getNewTeacher() != null && !newEntry.getNewTeacher().equals("null"))
+                                        builder.append("Vertreter: ").append(newEntry.getNewTeacher()).append("\n");
+                                    if(newEntry.getNewSubject() != null && !newEntry.getNewSubject().equals("null"))
+                                        builder.append("Neues Fach: ").append(newEntry.getNewSubject()).append("\n");
+                                    if(newEntry.getNewRoom() != null && !newEntry.getNewRoom().equals("null"))
+                                        builder.append("Neuer Raum: ").append(newEntry.getNewRoom()).append("\n");
+                                    if(newEntry.getNewHour() != null && !newEntry.getNewHour().equals("null"))
+                                        builder.append("Neue Stunde: ").append(newEntry.getNewHour()).append("\n");
+
+
+                                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,builder.toString()));
                                 }
                             }
                         }

@@ -30,12 +30,27 @@ public class CallbackNotifyAddClassFinish implements KeyboardCallback {
 
         VertretungsPlanBot.getBot().execute(editMessageText);
         for (VertretungsEntry allRelevantEntriesByClass : SQLManager.getAllRelevantEntriesByClass(className)) {
-            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(),
-                    "Neuer eintrag für den " + allRelevantEntriesByClass.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
-                            "Klasse: " + allRelevantEntriesByClass.getClassName() + "\n" +
-                            "Stunde: " + allRelevantEntriesByClass.getDefaultHour() + "\n" +
-                            "Fach: " + allRelevantEntriesByClass.getDefaultSubject() + "\n" +
-                            "Anmerkung: " + allRelevantEntriesByClass.getNote()));
+            StringBuilder builder = new StringBuilder();
+            builder.append("Neuer eintrag für den ")
+                    .append(allRelevantEntriesByClass.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                    .append("\n");
+
+            builder.append("Klasse: ").append(allRelevantEntriesByClass.getClassName()).append("\n");
+            builder.append("Stunde: ").append(allRelevantEntriesByClass.getDefaultHour()).append("\n");
+            builder.append("Fach: ").append(allRelevantEntriesByClass.getDefaultSubject()).append("\n");
+            if(allRelevantEntriesByClass.getNote() != null && !allRelevantEntriesByClass.getNote().equals("null"))
+                builder.append("Anmerkung: ").append(allRelevantEntriesByClass.getNote()).append("\n");
+            if(allRelevantEntriesByClass.getNewTeacher() != null && !allRelevantEntriesByClass.getNewTeacher().equals("null"))
+                builder.append("Vertreter: ").append(allRelevantEntriesByClass.getNewTeacher()).append("\n");
+            if(allRelevantEntriesByClass.getNewSubject() != null && !allRelevantEntriesByClass.getNewSubject().equals("null"))
+                builder.append("Neues Fach: ").append(allRelevantEntriesByClass.getNewSubject()).append("\n");
+            if(allRelevantEntriesByClass.getNewRoom() != null && !allRelevantEntriesByClass.getNewRoom().equals("null"))
+                builder.append("Neuer Raum: ").append(allRelevantEntriesByClass.getNewRoom()).append("\n");
+            if(allRelevantEntriesByClass.getNewHour() != null && !allRelevantEntriesByClass.getNewHour().equals("null"))
+                builder.append("Neue Stunde: ").append(allRelevantEntriesByClass.getNewHour()).append("\n");
+
+
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), builder.toString()));
 
         }
 
