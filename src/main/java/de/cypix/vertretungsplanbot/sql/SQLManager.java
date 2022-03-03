@@ -1,12 +1,10 @@
 package de.cypix.vertretungsplanbot.sql;
 
-import com.pengrad.telegrambot.request.SendMessage;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
