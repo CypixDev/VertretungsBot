@@ -34,6 +34,11 @@ public class VertretungsPlanBot {
     private static Updater updater;
     private static final Logger logger = Logger.getRootLogger();
 
+    /*
+    TODO:
+    - Verify system if using multiple platforms like discord
+        - Check with Email- address, sending email with code and verify using Telegram/Discord
+     */
 
     public static void main(String[] args) {
         setupLogger();

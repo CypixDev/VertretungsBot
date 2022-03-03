@@ -6,6 +6,7 @@ import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -65,6 +66,26 @@ public class SQLManager {
         //TODO: Check if it's properly working
         ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE representation_date >= CURRENT_DATE");
         return getVertretungsEntries(rs);
+    }
+
+    public static List<String> getAllData(long chatId){
+        List<String> list = new ArrayList<>();
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM user WHERE chat_id="+chatId);
+        try{
+            if(rs != null && rs.next()){
+                list.add("Vorname: "+rs.getString("user_first_name"));
+                list.add("Nachname: "+rs.getString("user_last_name"));
+                list.add("Username: "+rs.getString("user_name"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        list.add("Alle notifications:");
+        for (String s : getAllNotifiesByChatId(chatId)) {
+            list.add("- "+s);
+        }
+        return list;
     }
 
     public static void deleteNotification(long chatId, String className){
