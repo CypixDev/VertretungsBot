@@ -82,7 +82,19 @@ public class SQLConnector {
                     "new_hour,  " +
                     "new_room, " +
                     "new_teacher, " +
-                    "new_subject));");
+                    "new_subject));");/*
+            executeUpdate("CRETE TABLE IF NOT EXISTS entry_update(entry_id INT," +
+                    ")");
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_class(" +
+                    "class_id PRIMARY KEY INT AUTO_INCREMENT," +
+                    "class_name CHAR(6) NOT NULL)");
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_room(" +
+                    "room_id PRIMARY KEY INT AUTO_INCREMENT," +
+                    "room_name CHAR(4) NOT NULL)");
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_teacher(" +
+                    "teacher_id PRIMARY KEY AUTO_INCREMENT," +
+                    "teacher_short CHAR(2) NOT NULL," +
+                    "teacher_name VARCHAR(50) NOT NULL");*/
 
 
 
