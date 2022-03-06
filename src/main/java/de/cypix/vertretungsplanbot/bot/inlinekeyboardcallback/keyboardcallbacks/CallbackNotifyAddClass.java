@@ -77,15 +77,15 @@ public class CallbackNotifyAddClass implements KeyboardCallback {
             case 8:
                 for (int i = 0; i < classes.get(educationProgram).length; i += 2) {
                     inlineKeyboard.addRow(
-                            new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[0]).callbackData(
+                            new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[i]).callbackData(
                                     new KeyboardCallBackBuilder(
                                             KeyboardCallbackType.NOTIFY, "addClassFinish")
-                                            .addData("class", educationProgram + classes.get(educationProgram)[0])
+                                            .addData("class", educationProgram + classes.get(educationProgram)[i])
                                             .build()),
-                            new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[1]).callbackData(
+                            new InlineKeyboardButton(educationProgram + classes.get(educationProgram)[i+1]).callbackData(
                                     new KeyboardCallBackBuilder(
                                             KeyboardCallbackType.NOTIFY, "addClassFinish")
-                                            .addData("class", educationProgram + classes.get(educationProgram)[1])
+                                            .addData("class", educationProgram + classes.get(educationProgram)[i+1])
                                             .build()));
                 }
 
