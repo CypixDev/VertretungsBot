@@ -2,7 +2,6 @@ package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.EditMessageText;
@@ -38,16 +37,16 @@ public class CallbackNotifyAddClassFinish implements KeyboardCallback {
             builder.append("Klasse: ").append(allRelevantEntriesByClass.getClassName()).append("\n");
             builder.append("Stunde: ").append(allRelevantEntriesByClass.getDefaultHour()).append("\n");
             builder.append("Fach: ").append(allRelevantEntriesByClass.getDefaultSubject()).append("\n");
-            if(allRelevantEntriesByClass.getNote() != null && !allRelevantEntriesByClass.getNote().equals("null"))
-                builder.append("Anmerkung: ").append(allRelevantEntriesByClass.getNote()).append("\n");
-            if(allRelevantEntriesByClass.getNewTeacher() != null && !allRelevantEntriesByClass.getNewTeacher().equals("null"))
-                builder.append("Vertreter: ").append(allRelevantEntriesByClass.getNewTeacher()).append("\n");
-            if(allRelevantEntriesByClass.getNewSubject() != null && !allRelevantEntriesByClass.getNewSubject().equals("null"))
-                builder.append("Neues Fach: ").append(allRelevantEntriesByClass.getNewSubject()).append("\n");
-            if(allRelevantEntriesByClass.getNewRoom() != null && !allRelevantEntriesByClass.getNewRoom().equals("null"))
-                builder.append("Neuer Raum: ").append(allRelevantEntriesByClass.getNewRoom()).append("\n");
-            if(allRelevantEntriesByClass.getNewHour() != null && !allRelevantEntriesByClass.getNewHour().equals("null"))
-                builder.append("Neue Stunde: ").append(allRelevantEntriesByClass.getNewHour()).append("\n");
+            if(allRelevantEntriesByClass.getLastEntryUpdate().getNote() != null && !allRelevantEntriesByClass.getLastEntryUpdate().getNote().equals("null"))
+                builder.append("Anmerkung: ").append(allRelevantEntriesByClass.getLastEntryUpdate().getNote()).append("\n");
+            if(allRelevantEntriesByClass.getLastEntryUpdate().getTeacherLong() != null && !allRelevantEntriesByClass.getLastEntryUpdate().getTeacherLong().equals("null"))
+                builder.append("Vertreter: ").append(allRelevantEntriesByClass.getLastEntryUpdate().getTeacherLong()).append("\n");
+            if(allRelevantEntriesByClass.getLastEntryUpdate().getSubject() != null && !allRelevantEntriesByClass.getLastEntryUpdate().getSubject().equals("null"))
+                builder.append("Neues Fach: ").append(allRelevantEntriesByClass.getLastEntryUpdate().getSubject()).append("\n");
+            if(allRelevantEntriesByClass.getLastEntryUpdate().getRoom() != null && !allRelevantEntriesByClass.getLastEntryUpdate().getRoom().equals("null"))
+                builder.append("Neuer Raum: ").append(allRelevantEntriesByClass.getLastEntryUpdate().getRoom()).append("\n");
+            if(allRelevantEntriesByClass.getLastEntryUpdate().getHour() != null && !allRelevantEntriesByClass.getLastEntryUpdate().getHour().equals("null"))
+                builder.append("Neue Stunde: ").append(allRelevantEntriesByClass.getLastEntryUpdate().getHour()).append("\n");
 
 
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), builder.toString()));
