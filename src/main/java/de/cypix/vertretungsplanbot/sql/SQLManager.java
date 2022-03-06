@@ -2,6 +2,7 @@ package de.cypix.vertretungsplanbot.sql;
 
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
+import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntryUpdate;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -14,44 +15,114 @@ import java.util.List;
 public class SQLManager {
 
     public static void insertNewEntry(VertretungsEntry entry) {
-        //TODO: Fix String bilder with "," and "'"
+        //TODO: Fix String builder with "," and "'"
+
         StringBuilder query = new StringBuilder("INSERT INTO entry(");
-        query.append("last_refresh_timestamp,");
-        query.append("representation_date,");
-        query.append("class,");
-        query.append("default_hour,");
-        query.append("default_room,");
-        query.append("default_teacher,");
-        query.append("default_subject");
-        if (entry.getNote() != null) query.append(",").append("note");
-        if (entry.getNewHour() != null) query.append(",").append("new_hour");
-        if (entry.getNewRoom() != null) query.append(",").append("new_room");
-        if (entry.getNewTeacher() != null) query.append(",").append("new_teacher");
-        if (entry.getNewSubject() != null) query.append(",").append("new_subject");
+        query.append("registration_timestamp_id,");
+        query.append("representation_date_id,");
+        query.append("class_id,");
+        query.append("default_hour_id,");
+        query.append("default_room_id,");
+        query.append("default_teacher_id,");
+        query.append("default_subject_id");
+
         query.append(") VALUES (");
-        query.append("'").append(entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'");
-        query.append(", '").append(entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))).append("'");
-        query.append(", '").append(entry.getClassName()).append("'");
-        query.append(", '").append(entry.getDefaultHour()).append("'");
-        query.append(", '").append(entry.getDefaultRoom()).append("'");
-        query.append(", '").append(entry.getDefaultTeacher()).append("'");
-        query.append(", '").append(entry.getDefaultSubject()).append("'");
-        if (entry.getNote() != null) query.append(", '").append(entry.getNote()).append("'");
-        if (entry.getNewHour() != null) query.append(", '").append(entry.getNewHour()).append("'");
-        if (entry.getNewRoom() != null) query.append(", '").append(entry.getNewRoom()).append("'");
-        if (entry.getNewTeacher() != null) query.append(", '").append(entry.getNewTeacher()).append("'");
-        if (entry.getNewSubject() != null) query.append(", '").append(entry.getNewSubject()).append("'");
-        query.append(")");
+
+        if (!SQLManager.exists("entry_timestamp",
+                "timestamp_time",
+                entry.getRegistrationTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            SQLManager.insertNewTimeStamp(entry.getRegistrationTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        query.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
+                .append(entry.getRegistrationTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'), ");
+
+/*
+        if (!SQLManager.exists("entry_timestamp",
+                "timestamp_time",
+                entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            SQLManager.insertNewTimeStamp(entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        query.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
+                .append(entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'), ");
+*/
+
+
+        if (!SQLManager.exists("entry_timestamp",
+                "timestamp_time",
+                entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
+            SQLManager.insertNewTimeStamp(entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        query.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
+                .append(entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))).append("'), ");
+
+
+        if (!SQLManager.exists("entry_class", "class_name", entry.getClassName()))
+            SQLManager.insertNewClass(entry.getClassName());
+        query.append("(SELECT class_id FROM entry_class WHERE class_name='").append(entry.getClassName()).append("'), ");
+
+        if (!SQLManager.exists("entry_hour", "hour_name", entry.getDefaultHour()))
+            SQLManager.insertNewHour(entry.getDefaultHour());
+        query.append("(SELECT hour_id FROM entry_hour WHERE hour_name='").append(entry.getDefaultHour()).append("'), ");
+
+        if (!SQLManager.exists("entry_room", "room_name", entry.getDefaultRoom()))
+            SQLManager.insertNewRoom(entry.getDefaultRoom());
+        query.append("(SELECT room_id FROM entry_room WHERE room_name='").append(entry.getDefaultRoom()).append("'), ");
+
+        if (!SQLManager.exists("entry_teacher", "teacher_name", entry.getDefaultTeacherLong()))
+            SQLManager.insertNewTeacher(entry.getDefaultTeacherShort(), entry.getDefaultTeacherLong());
+        query.append("(SELECT teacher_id FROM entry_teacher WHERE teacher_name='").append(entry.getDefaultTeacherLong()).append("'), ");
+
+
+        if (!SQLManager.exists("entry_subject", "subject_name", entry.getDefaultSubject()))
+            SQLManager.insertNewSubject(entry.getDefaultSubject());
+        query.append("(SELECT subject_id FROM entry_subject WHERE subject_name='").append(entry.getDefaultSubject()).append("'))");
 
         VertretungsPlanBot.getSqlConnector().executeUpdate(query.toString());
+        insertNewUpdate(getLastInsertedEntryId(), entry.getLastEntryUpdate());
     }
 
+    public static int getLastInsertedEntryId(){
+        ResultSet set = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT LAST_INSERT_ID(entry_id) AS entry_id FROM entry ORDER BY entry_id DESC LIMIT 1;");
+        try {
+            if(set.next()) return set.getInt("entry_id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    private static void insertNewNote(String note) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_note(note_name) VALUES ('" + note + "')");
+    }
+
+    private static void insertNewClass(String className) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_class(class_name) VALUES ('" + className + "')");
+    }
+
+    private static void insertNewRoom(String roomName) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_room(room_name) VALUES ('" + roomName + "')");
+    }
+
+    private static void insertNewHour(String hourName) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_hour(hour_name) VALUES ('" + hourName + "')");
+    }
+
+    private static void insertNewTeacher(String teacherShort, String teacherName) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_teacher(teacher_short, teacher_name) VALUES ('" + teacherShort + "', '" + teacherName + "')");
+    }
+
+    private static void insertNewSubject(String subjectName) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_subject(subject_name) VALUES ('" + subjectName + "')");
+    }
+
+    private static void insertNewTimeStamp(String timeStamp) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO entry_timestamp(timestamp_time) VALUES ('" + timeStamp + "')");
+    }
+
+    @Deprecated
     public static void updateEntry(VertretungsEntry entry) {
-        VertretungsPlanBot.getSqlConnector().executeUpdate("UPDATE entry SET note='" + entry.getNote() +
+        VertretungsPlanBot.getSqlConnector().executeUpdate("UPDATE entry SET note='" +/* entry.getNote() +
                 "', new_hour='" + entry.getNewHour() +
                 "', new_room='" + entry.getNewRoom() +
                 "', new_teacher='" + entry.getNewTeacher() +
-                "', new_subject='" + entry.getNewSubject() + "'" +
+                "', new_subject='" + entry.getNewSubject() + "'" +*/
                 "WHERE " +
                 "representation_date='" + entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "' " +
                 "AND " +
@@ -60,20 +131,182 @@ public class SQLManager {
                 "default_hour='" + entry.getDefaultHour() + "';");
     }
 
+    public static void insetNewUpdate(UpdateType type, VertretungsEntry entry){
+        String value = "";
+        switch (type){
+/*            case NOTE -> value = entry.getNote();
+            case HOUR -> value = entry.getNewHour();
+            case ROOM -> value = entry.getNewRoom();
+            case TEACHER -> value = entry.getNewTeacher();
+            case SUBJECT -> value = entry.getNewSubject();*/
+        }
+        //Just normal check for nor bad info
+        if(value == null || value.equals("") || value.equals(" ")) return;
+
+        insertNewUpdate(type, entry.getEntryId(), value);
+    }
+
+    public static void insertNewUpdate(int entryId, VertretungsEntryUpdate entryUpdate){
+        StringBuilder str = new StringBuilder("INSERT INTO entry_update(entry_id, registration_timestamp_id) VALUES (");
+        str.append(entryId).append(", ");
+        if (!SQLManager.exists("entry_timestamp", "timestamp_time",
+                entryUpdate.getRegistrationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            SQLManager.insertNewTimeStamp(entryUpdate.getRegistrationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        str.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
+                .append(entryUpdate.getRegistrationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'))");
+        VertretungsPlanBot.getSqlConnector().executeUpdate(str.toString());
+        entryUpdate.setUpdateId(getNewestEntryUpdateId(entryId));
+
+        for (UpdateType type : entryUpdate.getUpdateTypeList()) {
+            String value = entryUpdate.getValue(type);
+            StringBuilder query = new StringBuilder("INSERT INTO ");
+            query.append(type.tableName);
+            query.append("(entry_update_id, ");
+            query.append(type.entryColumnId);
+            query.append(")");
+            query.append(" VALUES ");
+            query.append("(");
+            query.append(entryUpdate.getUpdateId());
+            query.append(", ");
+            if (!SQLManager.exists(type.entryTableName, type.entryColumnIdName, type == UpdateType.TEACHER ? value.split("__")[1] : value))
+                switch (type) {
+                    case NOTE -> SQLManager.insertNewNote(value);
+                    case HOUR -> SQLManager.insertNewHour(value);
+                    case ROOM -> SQLManager.insertNewRoom(value);
+                    case TEACHER -> SQLManager.insertNewTeacher(value.split("__")[0], value.split("__")[1]);
+                    case SUBJECT -> SQLManager.insertNewSubject(value);
+                }
+            query.append("(SELECT ")
+                    .append(type.columnIdName)
+                    .append(" FROM ")
+                    .append(type.entryTableName)
+                    .append(" WHERE ")
+                    .append(type.entryColumnIdName).append("='")
+                    .append(type == UpdateType.TEACHER ? value.split("__")[1] : value).append("'))");
+            VertretungsPlanBot.getSqlConnector().executeUpdate(query.toString());
+        }
+    }
+
+    private static int getNewestEntryUpdateId(int entryId) {
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT entry_update_id FROM entry_update WHERE entry_id="+entryId+" " +
+                "ORDER BY registration_timestamp_id DESC LIMIT 1");
+        try {
+            if(rs.next()) return rs.getInt("entry_update_id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Deprecated
+    public static void insertNewUpdate(UpdateType type, int entryId, String value){
+        StringBuilder query = new StringBuilder("INSERT INTO ");
+        query.append(type.tableName);
+        query.append("(registration_timestamp_id, entry_id, ");
+        query.append(type.entryColumnId);
+        query.append(")");
+        query.append(" VALUES ");
+        query.append("(");
+        if (!SQLManager.exists("entry_timestamp",
+                "timestamp_time",
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            SQLManager.insertNewTimeStamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        query.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
+                .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'), ");
+        query.append(entryId);
+        query.append(", ");
+        if (!SQLManager.exists(type.entryTableName, type.entryColumnIdName, type == UpdateType.TEACHER ? value.split("__")[1] : value))
+            switch (type) {
+                case NOTE -> SQLManager.insertNewNote(value);
+                case HOUR -> SQLManager.insertNewHour(value);
+                case ROOM -> SQLManager.insertNewRoom(value);
+                case TEACHER -> SQLManager.insertNewTeacher(value.split("__")[0], value.split("__")[1]);
+                case SUBJECT -> SQLManager.insertNewSubject(value);
+            }
+        query.append("(SELECT ")
+                .append(type.columnIdName)
+                .append(" FROM ")
+                .append(type.entryTableName)
+                .append(" WHERE ")
+                .append(type.entryColumnIdName).append("='")
+                .append(type == UpdateType.TEACHER ? value.split("__")[1] : value).append("'))");
+        System.out.println("QUERY: "+query.toString());
+        VertretungsPlanBot.getSqlConnector().executeUpdate(query.toString());
+
+    }
+
     public static List<VertretungsEntry> getAllRelevantEntries() {
-        //TODO: Check if it's properly working
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE representation_date >= CURRENT_DATE");
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet(
+                "SELECT entry.entry_id AS entry_id, register_datetime.timestamp_time AS registration_timestamp, " +
+                        "representation_date.timestamp_time AS representation_date, entry_class.class_name AS class, default_hour.hour_name AS default_hour, " +
+                        "default_room.room_name AS default_room, default_teacher.teacher_name AS default_teacher_long, default_teacher.teacher_short AS default_teacher_short, default_subject.subject_name AS default_subject " +
+                        "FROM entry " +
+                        "" +
+                        "LEFT JOIN entry_timestamp AS register_datetime ON entry.registration_timestamp_id = register_datetime.timestamp_id " +
+                        "LEFT JOIN entry_timestamp AS representation_date ON entry.representation_date_id = representation_date.timestamp_id " +
+                        "" +
+                        "LEFT JOIN entry_class ON entry.class_id = entry_class.class_id " +
+                        "" +
+                        "LEFT JOIN entry_hour AS default_hour ON entry.default_hour_id = default_hour.hour_id " +
+                        "LEFT JOIN entry_room AS default_room ON entry.default_room_id = default_room.room_id " +
+                        "LEFT JOIN entry_teacher AS default_teacher ON entry.default_teacher_id = default_teacher.teacher_id " +
+                        "LEFT JOIN entry_subject AS default_subject ON entry.default_subject_id = default_subject.subject_id " +
+                        "" +
+                        "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
+                        "GROUP BY entry.entry_id; "
+        );
         return getVertretungsEntries(rs);
     }
 
-    public static List<String> getAllData(long chatId){
-        List<String> list = new ArrayList<>();
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM user WHERE chat_id="+chatId);
+    public static VertretungsEntryUpdate getLastVertretungsEntryUpdate(VertretungsEntry entry){
+        if(entry.getEntryId() == 0) return null;
+        //TODO: select just what is needed!
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry_update " +
+                "LEFT JOIN entry_timestamp AS register_datetime ON entry_update.registration_timestamp_id = register_datetime.timestamp_id " +
+
+                "LEFT JOIN entry_update_note ON entry_update.entry_update_id = entry_update_note.entry_update_id " +
+                "LEFT JOIN entry_note ON entry_note.note_id = entry_update_note.note_id " +
+
+                "LEFT JOIN entry_update_hour ON entry_update.entry_update_id = entry_update_hour.entry_update_id " +
+                "LEFT JOIN entry_hour ON entry_hour.hour_id = entry_update_hour.hour_id " +
+
+                "LEFT JOIN entry_update_room ON entry_update.entry_update_id = entry_update_room.entry_update_id " +
+                "LEFT JOIN entry_room ON entry_room.room_id = entry_update_room.room_id " +
+
+                "LEFT JOIN entry_update_teacher ON entry_update.entry_update_id = entry_update_teacher.entry_update_id " +
+                "LEFT JOIN entry_teacher ON entry_teacher.teacher_id = entry_update_teacher.teacher_id " +
+
+                "LEFT JOIN entry_update_subject ON entry_update.entry_update_id = entry_update_subject.entry_update_id " +
+                "LEFT JOIN entry_subject ON entry_subject.subject_id = entry_update_subject.subject_id " +
+
+                "WHERE entry_id = "+entry.getEntryId()+" " +
+                "ORDER BY registration_timestamp_id DESC LIMIT 1");
         try{
-            if(rs != null && rs.next()){
-                list.add("Vorname: "+rs.getString("user_first_name"));
-                list.add("Nachname: "+rs.getString("user_last_name"));
-                list.add("Username: "+rs.getString("user_name"));
+            while (rs.next()) {
+                //TODO: locally save vars or verify they are saved locally - Working for testing...
+                VertretungsEntryUpdate entryUpdate = new VertretungsEntryUpdate(entry, rs.getTimestamp("register_datetime.timestamp_time").toLocalDateTime());
+                if(rs.getString("entry_note.note_name") != null && !rs.getString("entry_note.note_name").equalsIgnoreCase("null")) entryUpdate.setNote(rs.getString("entry_note.note_name"));
+                if(rs.getString("entry_hour.hour_name") != null && !rs.getString("entry_hour.hour_name").equalsIgnoreCase("null")) entryUpdate.setHour(rs.getString("entry_hour.hour_name"));
+                if(rs.getString("entry_room.room_name") != null && !rs.getString("entry_room.room_name").equalsIgnoreCase("null")) entryUpdate.setRoom(rs.getString("entry_room.room_name"));
+                if(rs.getString("entry_teacher.teacher_name") != null && !rs.getString("entry_teacher.teacher_name").equalsIgnoreCase("null")) entryUpdate.setTeacherLong(rs.getString("entry_teacher.teacher_name"));
+                if(rs.getString("entry_teacher.teacher_short") != null && !rs.getString("entry_teacher.teacher_short").equalsIgnoreCase("null")) entryUpdate.setTeacherShort(rs.getString("entry_teacher.teacher_short"));
+                if(rs.getString("entry_subject.subject_name") != null && !rs.getString("entry_subject.subject_name").equalsIgnoreCase("null")) entryUpdate.setSubject(rs.getString("entry_subject.subject_name"));
+                return (entryUpdate);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<String> getAllData(long chatId) {
+        List<String> list = new ArrayList<>();
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM user WHERE chat_id=" + chatId);
+        try {
+            if (rs != null && rs.next()) {
+                list.add("Vorname: " + rs.getString("user_first_name"));
+                list.add("Nachname: " + rs.getString("user_last_name"));
+                list.add("Username: " + rs.getString("user_name"));
             }
 
         } catch (SQLException e) {
@@ -81,13 +314,13 @@ public class SQLManager {
         }
         list.add("Alle notifications:");
         for (String s : getAllNotifiesByChatId(chatId)) {
-            list.add("- "+s);
+            list.add("- " + s);
         }
         return list;
     }
 
-    public static void deleteNotification(long chatId, String className){
-        VertretungsPlanBot.getSqlConnector().executeUpdate("DELETE FROM notification WHERE user_id=(SELECT user_id FROM user WHERE chat_id="+chatId+") AND class='"+className+"';");
+    public static void deleteNotification(long chatId, String className) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("DELETE FROM notification WHERE user_id=(SELECT user_id FROM user WHERE chat_id=" + chatId + ") AND class='" + className + "';");
     }
 
     @NotNull
@@ -95,21 +328,17 @@ public class SQLManager {
         List<VertretungsEntry> list = new ArrayList<>();
         try {
             while (rs.next()) {
-                list.add(new VertretungsEntry(
+                VertretungsEntry entry = new VertretungsEntry(
                         rs.getInt("entry_id"),
                         rs.getTimestamp("registration_timestamp").toLocalDateTime(),
-                        rs.getTimestamp("last_refresh_timestamp").toLocalDateTime(),
                         rs.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
                         rs.getString("class"),
                         rs.getString("default_hour"),
                         rs.getString("default_room"),
-                        rs.getString("default_teacher"),
-                        rs.getString("default_subject"),
-                        rs.getString("note"),
-                        rs.getString("new_hour"),
-                        rs.getString("new_room"),
-                        rs.getString("new_teacher"),
-                        rs.getString("new_subject")));
+                        rs.getString("default_teacher_short")+" ("+rs.getString("default_teacher_long")+")",
+                        rs.getString("default_subject"));
+                entry.setLastEntryUpdate(getLastVertretungsEntryUpdate(entry));
+                list.add(entry);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -129,18 +358,12 @@ public class SQLManager {
                 return (new VertretungsEntry(
                         rs.getInt("entry_id"),
                         rs.getTimestamp("registration_timestamp").toLocalDateTime(),
-                        rs.getTimestamp("last_refresh_timestamp").toLocalDateTime(),
                         rs.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
                         rs.getString("class"),
                         rs.getString("default_hour"),
                         rs.getString("default_room"),
                         rs.getString("default_teacher"),
-                        rs.getString("default_subject"),
-                        rs.getString("note"),
-                        rs.getString("new_hour"),
-                        rs.getString("new_room"),
-                        rs.getString("new_teacher"),
-                        rs.getString("new_subject")));
+                        rs.getString("default_subject")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -161,6 +384,16 @@ public class SQLManager {
             return LocalDateTime.now().minusDays(1);
         }
         return LocalDateTime.now().minusDays(1);
+    }
+
+    public static boolean exists(String table, String column, String value) {
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM " + table + " WHERE " + column + "='" + value + "'");
+        try {
+            if (rs.next()) return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 
@@ -209,6 +442,7 @@ public class SQLManager {
         }
         return list;
     }
+
     public static List<String> getAllNotifiesByChatId(long chatId) {
         ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT class FROM notification" +
                 " INNER JOIN user ON notification.user_id = user.user_id" +
@@ -224,10 +458,10 @@ public class SQLManager {
         return list;
     }
 
-    public static boolean isRegistered(long chatId){
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT user_id FROM user WHERE chat_id="+chatId);
+    public static boolean isRegistered(long chatId) {
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT user_id FROM user WHERE chat_id=" + chatId);
         try {
-            if(rs.next())return true;
+            if (rs.next()) return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }

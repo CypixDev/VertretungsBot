@@ -44,6 +44,7 @@ public class SQLConnector {
 
     private void createTable() {
         if(isConnected()){
+            //Still usable
             executeUpdate("CREATE TABLE IF NOT EXISTS user(" +
                     "user_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "chat_id LONG, " +
@@ -56,7 +57,8 @@ public class SQLConnector {
                     "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE," +
                     "CONSTRAINT uc_class UNIQUE (user_id, class));");
 
-            executeUpdate("CREATE TABLE IF NOT EXISTS entry(" +
+            //OLD....
+/*            executeUpdate("CREATE TABLE IF NOT EXISTS entry(" +
                     "entry_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "registration_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                     "last_refresh_timestamp TIMESTAMP NOT NULL," +
@@ -82,28 +84,91 @@ public class SQLConnector {
                     "new_hour,  " +
                     "new_room, " +
                     "new_teacher, " +
-                    "new_subject));");/*
-            executeUpdate("CRETE TABLE IF NOT EXISTS entry_update(entry_id INT," +
-                    ")");
+                    "new_subject));");*/
+
+            //Entry - default stuff
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_timestamp(" +
+                    "timestamp_id INT PRIMARY KEY AUTO_INCREMENT," +
+                    "timestamp_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_class(" +
-                    "class_id PRIMARY KEY INT AUTO_INCREMENT," +
+                    "class_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "class_name CHAR(6) NOT NULL)");
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_room(" +
-                    "room_id PRIMARY KEY INT AUTO_INCREMENT," +
+                    "room_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "room_name CHAR(4) NOT NULL)");
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_hour(" +
+                    "hour_id INT PRIMARY KEY AUTO_INCREMENT," +
+                    "hour_name CHAR(6) NOT NULL)");
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_teacher(" +
-                    "teacher_id PRIMARY KEY AUTO_INCREMENT," +
+                    "teacher_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "teacher_short CHAR(2) NOT NULL," +
-                    "teacher_name VARCHAR(50) NOT NULL");*/
+                    "teacher_name VARCHAR(50) NOT NULL)");
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_subject(" +
+                    "subject_id INT PRIMARY KEY AUTO_INCREMENT," +
+                    "subject_name CHAR(4) NOT NULL)");
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_note(" +
+                    "note_id INT PRIMARY KEY AUTO_INCREMENT," +
+                    "note_name VARCHAR(50) NOT NULL)");
 
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry("+
+                    "entry_id INT PRIMARY KEY AUTO_INCREMENT," +
+                    "registration_timestamp_id INT," +
+                    "representation_date_id INT," +
+                    "class_id INT NOT NULL, " +
+                    "default_hour_id INT NOT NULL, " +
+                    "default_room_id INT NOT NULL, " +
+                    "default_teacher_id INT NOT NULL, " +
+                    "default_subject_id INT NOT NULL," +
+                    "FOREIGN KEY (registration_timestamp_id) REFERENCES entry_timestamp(timestamp_id), "+
+                    "FOREIGN KEY (representation_date_id) REFERENCES entry_timestamp(timestamp_id), "+
+                    "FOREIGN KEY (class_id) REFERENCES entry_class(class_id)," +
+                    "FOREIGN KEY (default_hour_id) REFERENCES entry_hour(hour_id)," +
+                    "FOREIGN KEY (default_room_id) REFERENCES entry_room(room_id)," +
+                    "FOREIGN KEY (default_teacher_id) REFERENCES entry_teacher(teacher_id)," +
+                    "FOREIGN KEY (default_subject_id) REFERENCES entry_subject(subject_id))");
 
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_update(" +
+                    "entry_update_id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "entry_id INT, " +
+                    "registration_timestamp_id INT, " +
+                    "FOREIGN KEY (entry_id) REFERENCES entry(entry_id), " +
+                    "FOREIGN KEY (registration_timestamp_id) REFERENCES entry_timestamp(timestamp_id));");
 
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_note(" +
+                    "entry_update_note_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "entry_update_id INT," +
+                    "note_id INT," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (note_id) REFERENCES entry_note(note_id));");
 
-/*            executeUpdatee("CREATE TABLE IF NOT EXISTS user(user_id INT PRIMARY KEY AUTO_INCREMENT, discord_id LONG, discord_name VARCHAR(255));");
-            executeUpdatee("CREATE TABLE IF NOT EXISTS private_channel(user_id INT, private_channel_id LONG);");
-            executeUpdatee("CREATE TABLE IF NOT EXISTS finish_user(user_id INT, task_id INT);");
-            executeUpdatee("CREATE TABLE IF NOT EXISTS user_ignore(user_id INT, subject_id TINYINT);");
-            executeUpdatee("CREATE TABLE IF NOT EXISTS user_reminder(user_id INT, time_before INT, time_unit TINYINT)");*/
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_hour(" +
+                    "entry_update_hour_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "entry_update_id INT," +
+                    "hour_id INT," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (hour_id) REFERENCES entry_hour(hour_id));");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_room(" +
+                    "entry_update_room_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "entry_update_id INT," +
+                    "room_id INT," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (room_id) REFERENCES entry_room(room_id));");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_teacher(" +
+                    "entry_update_teacher_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "entry_update_id INT," +
+                    "teacher_id INT," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (teacher_id) REFERENCES entry_teacher(teacher_id));");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_subject(" +
+                    "entry_update_subject_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "entry_update_id INT," +
+                    "subject_id INT," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (subject_id) REFERENCES entry_subject(subject_id));");
         }
     }
 
