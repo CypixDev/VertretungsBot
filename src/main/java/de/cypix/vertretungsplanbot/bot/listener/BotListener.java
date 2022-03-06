@@ -17,6 +17,11 @@ public class BotListener implements UpdatesListener {
         for (Update update : updates) {
             //Check if it's a message or keyboard callback
             if(update.message() != null){
+                if(VertretungsPlanBot.getConfigManager().isMaintenance() && update.message().chat().id() != 259699517) {
+                    VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Aktuell in Wartungen! Versuch es später nochmal."));
+                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+                }
+
                 //It's probably a message
                 String message = "";
                 String[] args = {""};
@@ -45,6 +50,11 @@ public class BotListener implements UpdatesListener {
                 }
 
             }else if(update.callbackQuery() != null){
+                if(VertretungsPlanBot.getConfigManager().isMaintenance() && update.callbackQuery().message().chat().id() != 259699517) {
+                    VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().message().chat().id(), "Aktuell in Wartungen! Versuch es später nochmal."));
+                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+                }
+
                 //It's probably a callback
                 if(update.callbackQuery().data().startsWith("type=keyboard;")){
                     String[] splitData = update.callbackQuery().data().split(";");

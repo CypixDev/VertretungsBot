@@ -2,6 +2,7 @@ package de.cypix.vertretungsplanbot.console;
 
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
+import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -41,6 +42,12 @@ public class ConsoleManager extends Thread{
         }
 
         if(args.length == 1){
+            if(args[0].equalsIgnoreCase("maintenance")){
+                if(VertretungsPlanBot.getConfigManager().isMaintenance()){
+                    System.out.println("Activ!");
+                }else System.out.println("Nicht activ");
+                return;
+            }
             if(args[0].equalsIgnoreCase("update")){
                 Updater.filter();
                 System.out.println("updated!");
@@ -59,6 +66,23 @@ public class ConsoleManager extends Thread{
             }
         }
         if(args.length == 2){
+            if(args[0].equalsIgnoreCase("simulate")){
+                if(args[1].equalsIgnoreCase("loss")){
+                    Updater.simulateLoss = true;
+                    System.out.println("Simulating loss....");
+                    return;
+                }
+                if(args[1].equalsIgnoreCase("update")){
+                    Updater.simulateUpdate = true;
+                    System.out.println("Simulating update....");
+                    return;
+                }
+                if(args[1].equalsIgnoreCase("add")){
+                    Updater.simulateAdd = true;
+                    System.out.println("Simulating add....");
+                    return;
+                }
+            }
             if(args[0].equalsIgnoreCase("start")){
                 if(args[1].equalsIgnoreCase("bot")){
                     VertretungsPlanBot.getInstance().startBot();

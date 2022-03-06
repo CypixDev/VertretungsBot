@@ -17,6 +17,7 @@ public class Config {
     public int sqlPort;
     public String guildName;
     public boolean startAutomatically;
+    public boolean maintenance;
 /*    public int WIDTH;
     public int HEIGHT;
     public double RATIO;
@@ -34,6 +35,7 @@ public class Config {
         this.sqlDatabase = "Vertretungsplanbot";
         this.sqlPort = 3306;
         this.startAutomatically = false;
+        this.maintenance = false;
 
 /*        this.NAMES = new ArrayList<String>();
         this.NAMES.add("Peter");
