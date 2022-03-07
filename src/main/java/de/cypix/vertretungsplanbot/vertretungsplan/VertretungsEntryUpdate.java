@@ -111,9 +111,9 @@ public class VertretungsEntryUpdate implements Comparable<VertretungsEntryUpdate
 
     @Override
     public int compareTo(@NotNull VertretungsEntryUpdate o) {
-/*        System.out.println("------------------------");
-        System.out.println("New:"+toString());
-        System.out.println("Old:"+o.toString());*/
+        System.out.println("------------------------");
+        System.out.println("NewUpdate:"+toString());
+        System.out.println("OldUpdate:"+o.toString());
         if (getNote() != null && o.getNote() != null){
             if(!getNote().equals(o.getNote())) return 2;
         }
@@ -128,9 +128,10 @@ public class VertretungsEntryUpdate implements Comparable<VertretungsEntryUpdate
         }
         if (getSubject() != null && o.getSubject() != null){
             if(!getSubject().equals(o.getSubject())) return 2;
-        }/*
+        }
         System.out.println("SAME");
-        System.out.println("------------------------");*/
+        System.out.println("------------------------");
+        System.out.println("------------------------");
         return 0;
     }
 

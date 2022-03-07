@@ -1,8 +1,10 @@
 package de.cypix.vertretungsplanbot.vertretungsplan;
 
 import com.pengrad.telegrambot.request.SendMessage;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyAddClass;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,6 +28,9 @@ public class Updater extends Thread {
     public static boolean simulateAdd = false;
 
     private static final boolean DEBUG = false;
+
+    private static final Logger logger = Logger.getLogger(Updater.class);
+
 
     @Override
     public void run() {
@@ -317,20 +322,29 @@ public class Updater extends Thread {
                             defaultRoom,
                             defaultTeacher,
                             defaultSubject);
-                    VertretungsEntryUpdate entryUpdate = new VertretungsEntryUpdate(entry, LocalDateTime.now());
-                    entryUpdate.setNote(note);
-                    entryUpdate.setHour(newHour);
-                    entryUpdate.setRoom(newRoom);
-                    //Check is needed her because of split.... Others don't need because 'null' will be filtered out...
-                    if(!newTeacher.equalsIgnoreCase("null") && !newTeacher.equalsIgnoreCase("") && !newTeacher.equalsIgnoreCase(" ")){
-                        entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", ""));
-                        entryUpdate.setTeacherShort(newTeacher.split(" ")[0]);
+                    if(!entry.getDefaultHour().equals("0..0")){
+                        VertretungsEntryUpdate entryUpdate = new VertretungsEntryUpdate(entry, LocalDateTime.now());
+                        entryUpdate.setNote(note);
+                        entryUpdate.setHour(newHour);
+                        entryUpdate.setRoom(newRoom);
+                        //Check is needed her because of split.... Others don't need because 'null' will be filtered out...
+                        if(!newTeacher.equalsIgnoreCase("null") && !newTeacher.equalsIgnoreCase("") && !newTeacher.equalsIgnoreCase(" ")){
+                            entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", ""));
+                            entryUpdate.setTeacherShort(newTeacher.split(" ")[0]);
+                        }
+                        entryUpdate.setSubject(newSubject);
+
+                        entry.setLastEntryUpdate(entryUpdate);
+
+                        list.add(entry);
+                    } else {
+                        /*
+                        Ist nötig da das eindeutige identifizieren an einigen stellen fehl schlagen kann....
+                        Bspw.: Es kann sein das der gleiche lehrer in der 1..2 und 3..4 dran kommt und dann
+                            ist die erste leiste exakt gleich....
+                         */
+                        logger.info("Additional hour is ignored for "+entry.getClassName());
                     }
-                    entryUpdate.setSubject(newSubject);
-
-                    entry.setLastEntryUpdate(entryUpdate);
-
-                    list.add(entry);
 
                 }
                 /* ADDING ALWAYS EVERYTHING!

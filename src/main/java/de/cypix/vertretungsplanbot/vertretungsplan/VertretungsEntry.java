@@ -82,20 +82,24 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
     }
 
     public String getClassName() {
+        if (className == null || className.equals("") || className.equals(" ") || className.equals("..") || className.equalsIgnoreCase("null")){
+            return "";
+        }
         return className;
     }
 
     public String getDefaultHour() {
+        if (defaultHour == null || defaultHour.equals("") || defaultHour.equals(" ") || defaultHour.equals("..") || defaultHour.equalsIgnoreCase("null")){
+            return "";
+        }
         return defaultHour;
     }
 
     public String getDefaultRoom() {
+        if (defaultRoom == null || defaultRoom.equals("") || defaultRoom.equals(" ") || defaultRoom.equals("..") || defaultRoom.equalsIgnoreCase("null")){
+            return "";
+        }
         return defaultRoom;
-    }
-
-    @Deprecated
-    public String getDefaultTeacher() {
-        return defaultTeacher;
     }
 
     public String getDefaultTeacherShort() {
@@ -135,13 +139,13 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
                 getClassName().replace(" ", "").equals(o.getClassName().replace(" ", "")) &&
                 getDefaultHour().replace(" ", "").equals(o.getDefaultHour().replace(" ", "")) &&
                 getDefaultRoom().replace(" ", "").equals(o.getDefaultRoom().replace(" ", ""));
-            /*DEBUG STUFF
+        //DEBUG STUFF
+
+        if (defaultSame) {/*
             System.out.println("------------------------");
             System.out.println("New:"+toString());
             System.out.println("Old:"+o.toString());
-            System.out.println("------------------------");
-            */
-        if (defaultSame) {
+            System.out.println("------------------------");*/
             if(getLastEntryUpdate() != null && o.getLastEntryUpdate() != null && getLastEntryUpdate().compareTo(o.getLastEntryUpdate()) != 0){
                 return 2;
             }
