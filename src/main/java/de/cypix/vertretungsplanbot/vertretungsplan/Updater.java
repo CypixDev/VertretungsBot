@@ -1,7 +1,6 @@
 package de.cypix.vertretungsplanbot.vertretungsplan;
 
 import com.pengrad.telegrambot.request.SendMessage;
-import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.CallbackNotifyAddClass;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
 import org.apache.log4j.Logger;
