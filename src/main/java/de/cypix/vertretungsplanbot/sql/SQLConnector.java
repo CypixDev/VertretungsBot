@@ -58,9 +58,17 @@ public class SQLConnector {
                     "user_last_name VARCHAR(50));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS notification(" +
-                    "user_id INT NOT NULL, class CHAR(6)," +
+                    "notification_id INT PRIMARY KEY AUTO_INCREMENT, " +
+                    "user_id INT NOT NULL, " +
+                    "class CHAR(6) NOT NULL," +
                     "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE," +
                     "CONSTRAINT uc_class UNIQUE (user_id, class));");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS remind(" +
+                    "remind_id INT PRIMARY KEY AUTO_INCREMENT, " +
+                    "notification_id INT NOT NULL, " +
+                    "hour TINYINT NOT NULL, " +
+                    "FOREIGN KEY (notification_id) REFERENCES notification(notification_id) ON DELETE CASCADE)");
 
             //OLD....
 /*            executeUpdate("CREATE TABLE IF NOT EXISTS entry(" +
@@ -137,42 +145,42 @@ public class SQLConnector {
                     "entry_update_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "entry_id INT, " +
                     "registration_timestamp_id INT, " +
-                    "FOREIGN KEY (entry_id) REFERENCES entry(entry_id), " +
+                    "FOREIGN KEY (entry_id) REFERENCES entry(entry_id) ON DELETE CASCADE, " +
                     "FOREIGN KEY (registration_timestamp_id) REFERENCES entry_timestamp(timestamp_id));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_note(" +
                     "entry_update_note_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "entry_update_id INT," +
                     "note_id INT," +
-                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (note_id) REFERENCES entry_note(note_id));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_hour(" +
                     "entry_update_hour_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "entry_update_id INT," +
                     "hour_id INT," +
-                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (hour_id) REFERENCES entry_hour(hour_id));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_room(" +
                     "entry_update_room_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "entry_update_id INT," +
                     "room_id INT," +
-                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (room_id) REFERENCES entry_room(room_id));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_teacher(" +
                     "entry_update_teacher_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "entry_update_id INT," +
                     "teacher_id INT," +
-                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (teacher_id) REFERENCES entry_teacher(teacher_id));");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_update_subject(" +
                     "entry_update_subject_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "entry_update_id INT," +
                     "subject_id INT," +
-                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id)," +
+                    "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (subject_id) REFERENCES entry_subject(subject_id));");
         }
     }

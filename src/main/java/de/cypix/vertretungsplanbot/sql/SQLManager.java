@@ -390,6 +390,7 @@ public class SQLManager {
         return LocalDateTime.now().minusDays(1);
     }
 
+
     public static boolean exists(String table, String column, String value) {
         ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM " + table + " WHERE " + column + "='" + value + "'");
         try {
@@ -493,5 +494,17 @@ public class SQLManager {
                         "AND entry.class_id=" + "(SELECT class_id FROM entry_class WHERE class_name='"+className+"')" +
                 "GROUP BY entry.entry_id;");
         return getVertretungsEntries(rs);
+    }
+
+    public static void insertNewRemind(int chatId, String className, int hour){
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO remind(notification_id, hour) VALUES (" +
+                "(SELECT notification_id FROM notification"+
+                "LEFT JOIN user ON user.chat_id = 259699517"+
+                "WHERE notification.class='DI91'), " + hour + ")");
+    }
+
+    public static void insertNewRemind(int notificationId, int hour){
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO remind(notification_id, hour) VALUES (" +
+                notificationId+", "+hour);
     }
 }
