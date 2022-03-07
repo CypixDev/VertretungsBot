@@ -469,7 +469,25 @@ public class SQLManager {
     }
 
     public static List<VertretungsEntry> getAllRelevantEntriesByClass(String className) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE class='" + className + "' AND representation_date >= CURRENT_DATE;");
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet(
+                "SELECT entry.entry_id AS entry_id, register_datetime.timestamp_time AS registration_timestamp, " +
+                "representation_date.timestamp_time AS representation_date, entry_class.class_name AS class, default_hour.hour_name AS default_hour, " +
+                "default_room.room_name AS default_room, default_teacher.teacher_name AS default_teacher_long, default_teacher.teacher_short AS default_teacher_short, default_subject.subject_name AS default_subject " +
+                "FROM entry " +
+                "" +
+                "LEFT JOIN entry_timestamp AS register_datetime ON entry.registration_timestamp_id = register_datetime.timestamp_id " +
+                "LEFT JOIN entry_timestamp AS representation_date ON entry.representation_date_id = representation_date.timestamp_id " +
+                "" +
+                "LEFT JOIN entry_class ON entry.class_id = entry_class.class_id " +
+                "" +
+                "LEFT JOIN entry_hour AS default_hour ON entry.default_hour_id = default_hour.hour_id " +
+                "LEFT JOIN entry_room AS default_room ON entry.default_room_id = default_room.room_id " +
+                "LEFT JOIN entry_teacher AS default_teacher ON entry.default_teacher_id = default_teacher.teacher_id " +
+                "LEFT JOIN entry_subject AS default_subject ON entry.default_subject_id = default_subject.subject_id " +
+                "" +
+                "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
+                        "AND entry.class_id=" + "(SELECT class_id FROM entry_class WHERE class_name='"+className+"')" +
+                "GROUP BY entry.entry_id;");
         return getVertretungsEntries(rs);
     }
 }
