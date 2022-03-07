@@ -1,6 +1,11 @@
 package de.cypix.vertretungsplanbot.configuration;
 
+import de.cypix.vertretungsplanbot.console.ConsoleManager;
+import org.apache.log4j.Logger;
+
 public class ConfigManager {
+
+    private static final Logger logger = Logger.getLogger(ConfigManager.class);
 
     public ConfigManager(){
 
@@ -15,7 +20,7 @@ public class ConfigManager {
 
         // Speichern der Konfigurationsdatei
         Config.getInstance().toFile("config.json");
-        System.out.println("Successfully initialized config....");
+        logger.info("Successfully initialized config....");
 
     }
 
@@ -32,6 +37,7 @@ public class ConfigManager {
 
     public boolean isStatingAutomatically(){return Config.getInstance().startAutomatically;}
     public boolean isMaintenance(){return Config.getInstance().maintenance;}
+
 
 
     public String getChannelName(){return Config.getInstance().channelName;}

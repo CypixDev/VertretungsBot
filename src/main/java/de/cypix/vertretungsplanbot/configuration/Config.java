@@ -66,8 +66,7 @@ public class Config {
     }
 
     private static Config fromDefaults() {
-        Config config = new Config();
-        return config;
+        return new Config();
     }
 
     public void toFile(String file) {

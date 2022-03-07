@@ -1,10 +1,15 @@
 package de.cypix.vertretungsplanbot.sql;
 
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 
 public class SQLConnector {
+
+    private static final Logger logger = Logger.getLogger(SQLConnector.class);
+
+
     private static SQLConnector instance;
 
     private String host, database, user, password;
@@ -250,7 +255,7 @@ public class SQLConnector {
             connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database
                             + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin",
                     "" + user, password);
-            System.out.println("Successfully connected to Database!");
+            logger.info("Successfully connected to Database!");
             firstConnected = true;
         } catch (SQLException e) {
             e.printStackTrace();

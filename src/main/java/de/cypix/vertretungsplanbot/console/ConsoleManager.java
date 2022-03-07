@@ -27,11 +27,14 @@ public class ConsoleManager extends Thread{
 
     private void startConsole() throws IOException {
         scanner = new Scanner(System.in);
-
         logger.info("Console scanner started successfully");
 
+        String line = "";
         while(scanner.hasNext()){
-            handleConsoleInput(scanner.nextLine());
+            line = scanner.nextLine();
+            logger.info("Received console input["+line+"]");
+            handleConsoleInput(line);
+            System.out.print("VertretungsBot > ");
         }
     }
 
@@ -44,21 +47,22 @@ public class ConsoleManager extends Thread{
         if(args.length == 1){
             if(args[0].equalsIgnoreCase("maintenance")){
                 if(VertretungsPlanBot.getConfigManager().isMaintenance()){
-                    System.out.println("Activ!");
-                }else System.out.println("Nicht activ");
+                    logger.warn("Maintenance is activated");
+                }else logger.info("Maintenance is deactivated");
                 return;
             }
             if(args[0].equalsIgnoreCase("update")){
                 Updater.filter();
-                System.out.println("updated!");
+                logger.info("updated!");
+                return;
             }
             if(args[0].equalsIgnoreCase("status")){
-                System.out.println("SQL is "+(VertretungsPlanBot.getSqlConnector() != null && VertretungsPlanBot.getSqlConnector().isConnected() ? "connected" : "disconnected"));
-                //System.out.println("Bot is "+(VertretungsPlanBot.getBot(). ? "Offline(400ms)" : "Online"));
+                logger.info("SQL is "+(VertretungsPlanBot.getSqlConnector() != null && VertretungsPlanBot.getSqlConnector().isConnected() ? "connected" : "disconnected"));
+                //logger.info("Bot is "+(VertretungsPlanBot.getBot(). ? "Offline(400ms)" : "Online"));
                 return;
             }
             if(args[0].equalsIgnoreCase("stop")){
-                System.out.println("Shutting everything down....");
+                logger.warn("Shutting everything down....");
                 VertretungsPlanBot.getSqlConnector().closeConnection();
                 //TasksCheckBot.getJda().shutdownNow();
                 System.exit(1);
@@ -69,17 +73,17 @@ public class ConsoleManager extends Thread{
             if(args[0].equalsIgnoreCase("simulate")){
                 if(args[1].equalsIgnoreCase("loss")){
                     Updater.simulateLoss = true;
-                    System.out.println("Simulating loss....");
+                    logger.info("Simulating loss....");
                     return;
                 }
                 if(args[1].equalsIgnoreCase("update")){
                     Updater.simulateUpdate = true;
-                    System.out.println("Simulating update....");
+                    logger.info("Simulating update....");
                     return;
                 }
                 if(args[1].equalsIgnoreCase("add")){
                     Updater.simulateAdd = true;
-                    System.out.println("Simulating add....");
+                    logger.info("Simulating add....");
                     return;
                 }
             }
@@ -99,17 +103,18 @@ public class ConsoleManager extends Thread{
                 }
                 if(args[1].equalsIgnoreCase("updater")){
                     VertretungsPlanBot.getUpdater().start();
+                    return;
                 }
             }
             if(args[0].equalsIgnoreCase("stop")){
                 if(args[1].equalsIgnoreCase("sql")){
                     VertretungsPlanBot.getSqlConnector().closeConnection();
-                    System.out.println("Closed connection to sql");
+                    logger.info("Closed connection to sql");
                     return;
                 }
                 if(args[1].equalsIgnoreCase("bot")){
                     //TasksCheckBot.getJda().shutdownNow();
-                    System.out.println("Bot is now offline!");
+                    logger.info("Bot is now offline!");
                     return;
                 }
             }
@@ -119,7 +124,7 @@ public class ConsoleManager extends Thread{
                 if(args[1].equalsIgnoreCase("bot")){
                     String token = args[2];
                     VertretungsPlanBot.getInstance().startBot(token);
-                    System.out.println("Start Bot....");
+                    logger.info("Start Bot....");
                     return;
                 }
             }
@@ -145,7 +150,7 @@ public class ConsoleManager extends Thread{
     }
 
     private void sendHelp() {
-        System.out.println("No Help for you!");
+        logger.info("Command not known, sorry!");
     }
 
 }

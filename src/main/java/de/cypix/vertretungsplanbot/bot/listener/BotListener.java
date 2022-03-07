@@ -5,13 +5,18 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import de.cypix.vertretungsplanbot.bot.CleverBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
+import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class BotListener implements UpdatesListener {
+
+    private static final Logger logger = Logger.getLogger(UpdatesListener.class);
+
     @Override
     public int process(List<Update> updates) {
         for (Update update : updates) {
@@ -27,7 +32,7 @@ public class BotListener implements UpdatesListener {
                 String[] args = {""};
 
                 if (update.message().text() != null) {
-                    System.out.println("Incoming message: " + update.message().text());
+                    logger.info("Received message ["+update.message().chat().id()+"] " + update.message().text());
                     message = update.message().text();
                     args = message.split(" ");
                 }
@@ -78,10 +83,8 @@ public class BotListener implements UpdatesListener {
                         //Eigentlich unnötig glaube ich....
                     } else
                         VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Bitte regestriere dich zuerst mit /start"));
-                }else System.out.println("Called unknown callback, Data:"+update.callbackQuery().data());
-            }else{
-                System.out.println("Unknown update...");
-            }
+                }else logger.warn("Called unknown callback, Data:"+update.callbackQuery().data());
+            }else logger.warn("Received unknown update...");
         }
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }

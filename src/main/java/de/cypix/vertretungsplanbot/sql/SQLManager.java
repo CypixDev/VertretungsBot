@@ -3,6 +3,7 @@ package de.cypix.vertretungsplanbot.sql;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntryUpdate;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -13,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SQLManager {
+
+    private static final Logger logger = Logger.getLogger(SQLManager.class);
+
 
     public static void insertNewEntry(VertretungsEntry entry) {
         //TODO: Fix String builder with "," and "'"
@@ -230,7 +234,6 @@ public class SQLManager {
                 .append(" WHERE ")
                 .append(type.entryColumnIdName).append("='")
                 .append(type == UpdateType.TEACHER ? value.split("__")[1] : value).append("'))");
-        System.out.println("QUERY: "+query.toString());
         VertretungsPlanBot.getSqlConnector().executeUpdate(query.toString());
 
     }
@@ -371,6 +374,7 @@ public class SQLManager {
         return null;
     }
 
+    @Deprecated //Not checked....
     public static LocalDateTime getLastRegisteredRefresh() {
         ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT last_refresh_timestamp FROM entry ORDER BY last_refresh_timestamp DESC LIMIT 1");
         try {
@@ -380,7 +384,7 @@ public class SQLManager {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Returning now-1day because no entries...");
+            logger.info("Returning now-1day because no entries...");
             return LocalDateTime.now().minusDays(1);
         }
         return LocalDateTime.now().minusDays(1);

@@ -59,6 +59,9 @@ public class VertretungsPlanBot {
             instance.startBot();
             instance.startUpdater();
         }
+        if(configManager.isMaintenance()){
+            logger.warn("Maintenance is activated");
+        }
     }
 
     private void startUpdater() {
@@ -96,7 +99,7 @@ public class VertretungsPlanBot {
 
     public void startSQL(){
         sqlConnector = new SQLConnector(true);
-        System.out.println("Started SQL....");
+       logger.info("Started SQL....");
     }
 
     private static void setupLogger() {
@@ -109,7 +112,7 @@ public class VertretungsPlanBot {
             logger.setLevel( Level.ALL );
             logger.*/
         } catch( Exception ex ) {
-            System.out.println( ex );
+            logger.error(ex);
         }
     }
 
