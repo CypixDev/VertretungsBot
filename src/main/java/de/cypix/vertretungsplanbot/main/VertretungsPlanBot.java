@@ -78,6 +78,8 @@ public class VertretungsPlanBot {
         commandManager.registerCommand("/notifylist", new CMDNotifyList());
         commandManager.registerCommand("/status", new CMDStatus());
         commandManager.registerCommand("/getalldata", new CMDGetAllData());
+        commandManager.registerCommand("/deleteall", new CMDDeleteAll());
+        commandManager.registerCommand("/remind", new CMDRemind());
     }
 
     private static void registerKeyBoardCallBacks(){
