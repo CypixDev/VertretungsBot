@@ -507,4 +507,25 @@ public class SQLManager {
         VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO remind(notification_id, hour) VALUES (" +
                 notificationId+", "+hour);
     }
+
+    public static void deleteEverything(Long chatId) {
+        VertretungsPlanBot.getSqlConnector().executeUpdate("DELETE FROM user WHERE chat_id = "+chatId);
+        logger.info("Deleted all data from "+chatId);
+    }
+
+    public static List<Integer> getAllReminderByClassAndChatId(String className, long chatId) {
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT hour FROM remind " +
+                "INNER JOIN notification ON notification.notification_id = remind.notification_id " +
+                "INNER JOIN user ON user.chat_id = "+ chatId+" " +
+                "WHERE notification.class = '"+className+";");
+        List<Integer> list = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                list.add(rs.getInt("hour"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
