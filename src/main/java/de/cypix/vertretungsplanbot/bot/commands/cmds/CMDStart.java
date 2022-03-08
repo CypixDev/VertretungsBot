@@ -15,11 +15,15 @@ import com.pengrad.telegrambot.response.SendResponse;
 import de.cypix.vertretungsplanbot.bot.commands.TelegramCommand;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
+import org.apache.log4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
 
 public class CMDStart implements TelegramCommand {
+
+    private static final Logger logger = Logger.getLogger(CMDStart.class);
+
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
         if(!SQLManager.isRegistered(chat.id())){
@@ -27,6 +31,7 @@ public class CMDStart implements TelegramCommand {
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Wenn du dich für Vertretungen registrieren möchtest, tippe: /notify"));
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Achtung, zusätzliche Stunden werden nicht angezeigt!"));
             SQLManager.insertNewUser(chat.id(), user.firstName(), user.lastName());
+            logger.info("New user registered. [name='"+user.lastName()+"', firstname='"+user.firstName()+"', chatId="+chat.id()+"]");
         }else{
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Du bist bereits regestriert!\n" +
                     "Wenn du hilfe brauchst, benutzte /help"));
