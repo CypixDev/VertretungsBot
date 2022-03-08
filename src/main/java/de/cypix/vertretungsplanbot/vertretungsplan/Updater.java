@@ -116,13 +116,30 @@ public class Updater extends Thread {
                                         //SQLManager.updateEntry(newEntry);
                                         //TODO: Check what has changed and change it
                                         if(DEBUG) logger.info("entry updated!");
-                                        /*for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
-                                            VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass, "Änderung in "+newEntry.getNewSubject()+" und so weiter...."));
-                                        }*/
-                                        VertretungsPlanBot.getBot().execute(new SendMessage(259699517,"Aktuallisierung für:\n" +
-                                                "Datum: "+newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))+"\n" +
-                                                "Klasse: "+newEntry.getClassName()+"\n" +
-                                                "Stunden: "+newEntry.getDefaultHour()));
+
+                                        //Just build one time for all notifications
+                                        StringBuilder builder = new StringBuilder();
+                                        builder.append("Aktuallisierung für den ")
+                                                .append(newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                                                .append("\n");
+
+                                        builder.append("Klasse: ").append(newEntry.getClassName()).append("\n");
+                                        builder.append("Stunde: ").append(newEntry.getDefaultHour()).append("\n");
+                                        builder.append("Fach: ").append(newEntry.getDefaultSubject()).append("\n");
+                                        if(newEntry.getLastEntryUpdate().getNote() != null && !newEntry.getLastEntryUpdate().getNote().equals("null"))
+                                            builder.append("Anmerkung: ").append(newEntry.getLastEntryUpdate().getNote()).append("\n");
+                                        if(newEntry.getLastEntryUpdate().getTeacherLong() != null && !newEntry.getLastEntryUpdate().getTeacherLong().equals("null"))
+                                            builder.append("Vertreter: ").append(newEntry.getLastEntryUpdate().getTeacherLong()).append("\n");
+                                        if(newEntry.getLastEntryUpdate().getSubject() != null && !newEntry.getLastEntryUpdate().getSubject().equals("null"))
+                                            builder.append("Neues Fach: ").append(newEntry.getLastEntryUpdate().getSubject()).append("\n");
+                                        if(newEntry.getLastEntryUpdate().getRoom() != null && !newEntry.getLastEntryUpdate().getRoom().equals("null"))
+                                            builder.append("Neuer Raum: ").append(newEntry.getLastEntryUpdate().getRoom()).append("\n");
+                                        if(newEntry.getLastEntryUpdate().getHour() != null && !newEntry.getLastEntryUpdate().getHour().equals("null"))
+                                            builder.append("Neue Stunde: ").append(newEntry.getLastEntryUpdate().getHour()).append("\n");
+
+                                        for (Long chatId : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
+                                            VertretungsPlanBot.getBot().execute(new SendMessage(chatId, builder.toString()));
+                                        }
 
                                         break;
                                 }
@@ -135,23 +152,23 @@ public class Updater extends Thread {
                                 logger.info("Added new entry!");
                                 for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                     StringBuilder builder = new StringBuilder();
-                                    builder.append("Neuer eintrag für den ")
+                                    builder.append("Neuer Eintrag für den ")
                                             .append(newEntry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
                                             .append("\n");
 
                                     builder.append("Klasse: ").append(newEntry.getClassName()).append("\n");
                                     builder.append("Stunde: ").append(newEntry.getDefaultHour()).append("\n");
-                                    builder.append("Fach: ").append(newEntry.getDefaultSubject()).append("\n");/*
-                                    if(newEntry.getNote() != null && !newEntry.getNote().equals("null"))
-                                        builder.append("Anmerkung: ").append(newEntry.getNote()).append("\n");
-                                    if(newEntry.getNewTeacher() != null && !newEntry.getNewTeacher().equals("null"))
-                                        builder.append("Vertreter: ").append(newEntry.getNewTeacher()).append("\n");
-                                    if(newEntry.getNewSubject() != null && !newEntry.getNewSubject().equals("null"))
-                                        builder.append("Neues Fach: ").append(newEntry.getNewSubject()).append("\n");
-                                    if(newEntry.getNewRoom() != null && !newEntry.getNewRoom().equals("null"))
-                                        builder.append("Neuer Raum: ").append(newEntry.getNewRoom()).append("\n");
-                                    if(newEntry.getNewHour() != null && !newEntry.getNewHour().equals("null"))
-                                        builder.append("Neue Stunde: ").append(newEntry.getNewHour()).append("\n");*/
+                                    builder.append("Fach: ").append(newEntry.getDefaultSubject()).append("\n");
+                                    if(newEntry.getLastEntryUpdate().getNote() != null && !newEntry.getLastEntryUpdate().getNote().equals("null"))
+                                        builder.append("Anmerkung: ").append(newEntry.getLastEntryUpdate().getNote()).append("\n");
+                                    if(newEntry.getLastEntryUpdate().getTeacherLong() != null && !newEntry.getLastEntryUpdate().getTeacherLong().equals("null"))
+                                        builder.append("Vertreter: ").append(newEntry.getLastEntryUpdate().getTeacherLong()).append("\n");
+                                    if(newEntry.getLastEntryUpdate().getSubject() != null && !newEntry.getLastEntryUpdate().getSubject().equals("null"))
+                                        builder.append("Neues Fach: ").append(newEntry.getLastEntryUpdate().getSubject()).append("\n");
+                                    if(newEntry.getLastEntryUpdate().getRoom() != null && !newEntry.getLastEntryUpdate().getRoom().equals("null"))
+                                        builder.append("Neuer Raum: ").append(newEntry.getLastEntryUpdate().getRoom()).append("\n");
+                                    if(newEntry.getLastEntryUpdate().getHour() != null && !newEntry.getLastEntryUpdate().getHour().equals("null"))
+                                        builder.append("Neue Stunde: ").append(newEntry.getLastEntryUpdate().getHour()).append("\n");
 
                                     if(!VertretungsPlanBot.getConfigManager().isMaintenance() || allChatIDsByNotifyClass == 259699517)
                                         VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,builder.toString()));
