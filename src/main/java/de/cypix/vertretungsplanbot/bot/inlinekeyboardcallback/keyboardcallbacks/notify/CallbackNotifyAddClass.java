@@ -1,4 +1,4 @@
-package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks;
+package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.notify;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
@@ -12,9 +12,7 @@ import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackTy
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class CallbackNotifyAddClass implements KeyboardCallback {
 

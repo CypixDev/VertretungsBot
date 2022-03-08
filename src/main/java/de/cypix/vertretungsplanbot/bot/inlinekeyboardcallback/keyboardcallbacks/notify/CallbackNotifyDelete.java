@@ -1,4 +1,4 @@
-package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks;
+package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.notify;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;

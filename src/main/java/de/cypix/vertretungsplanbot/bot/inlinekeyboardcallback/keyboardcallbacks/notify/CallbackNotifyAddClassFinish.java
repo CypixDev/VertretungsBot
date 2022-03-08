@@ -1,4 +1,4 @@
-package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks;
+package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.notify;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
@@ -30,7 +30,7 @@ public class CallbackNotifyAddClassFinish implements KeyboardCallback {
         VertretungsPlanBot.getBot().execute(editMessageText);
         for (VertretungsEntry allRelevantEntriesByClass : SQLManager.getAllRelevantEntriesByClass(className)) {
             StringBuilder builder = new StringBuilder();
-            builder.append("Neuer eintrag für den ")
+            builder.append("Neuer Eintrag für den ")
                     .append(allRelevantEntriesByClass.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
                     .append("\n");
 
