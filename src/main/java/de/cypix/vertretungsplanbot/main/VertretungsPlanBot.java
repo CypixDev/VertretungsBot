@@ -3,7 +3,7 @@ package de.cypix.vertretungsplanbot.main;
 import com.pengrad.telegrambot.TelegramBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
-import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.*;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.notify.*;
 import de.cypix.vertretungsplanbot.bot.listener.BotListener;
 import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
 import de.cypix.vertretungsplanbot.bot.commands.cmds.*;
@@ -11,15 +11,8 @@ import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.console.ConsoleManager;
 import de.cypix.vertretungsplanbot.sql.SQLConnector;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
-import org.apache.log4j.DailyRollingFileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.xml.DOMConfigurator;
-
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class VertretungsPlanBot {
 
