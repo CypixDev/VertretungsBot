@@ -5,7 +5,6 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import de.cypix.vertretungsplanbot.bot.CleverBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
-import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
 import org.apache.log4j.Logger;
@@ -61,7 +60,7 @@ public class BotListener implements UpdatesListener {
                 }
 
                 //It's probably a callback
-                if(update.callbackQuery().data().startsWith("type=keyboard;")){
+                if(update.callbackQuery().data().startsWith("type=kb;")){
                     String[] splitData = update.callbackQuery().data().split(";");
                     HashMap<String, String> data = new HashMap<>();
 
@@ -72,17 +71,23 @@ public class BotListener implements UpdatesListener {
                         data.put(splitData[i].split("=")[0], splitData[i].split("=")[1]);
                     }
                     if (SQLManager.isRegistered(update.callbackQuery().from().id())) {
-                        if (!VertretungsPlanBot.getKeyboardCallbackManager().handle(
-                                KeyboardCallbackType.valueOf(Integer.parseInt(data.get("callbackType"))),
-                                data.get("key"),
-                                update,
-                                update.callbackQuery().message().chat(),
-                                data)) {
-                            VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Callback nicht bekannt!"));
+                        try{
+                            if (!VertretungsPlanBot.getKeyboardCallbackManager().handle(
+                                    KeyboardCallbackType.valueOf(Integer.parseInt(data.get("cType"))),
+                                    data.get("key"),
+                                    update,
+                                    update.callbackQuery().message().chat(),
+                                    data)) {
+                                VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Callback nicht bekannt!"));
+                            }
+                        }catch (Exception e){
+                            logger.error(e);
+                            VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Ein Fehler ist aufgetreten, bitte gebe dem Entwickler bescheid!"));
+
                         }
                         //Eigentlich unnötig glaube ich....
                     } else
-                        VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Bitte regestriere dich zuerst mit /start"));
+                        VertretungsPlanBot.getBot().execute(new SendMessage(update.callbackQuery().from().id(), "Bitte registriere dich zuerst mit /start"));
                 }else logger.warn("Called unknown callback, Data:"+update.callbackQuery().data());
             }else logger.warn("Received unknown update...");
         }

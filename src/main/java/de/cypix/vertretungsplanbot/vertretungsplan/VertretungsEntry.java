@@ -176,4 +176,30 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
                 ", defaultSubject='" + defaultSubject + '\'';
     }
 
+    public String getSendUpdateMessage(){
+        return getSendUpdateMessage("Neuer Eintrag");
+    }
+
+    public String getSendUpdateMessage(String reason){
+        StringBuilder builder = new StringBuilder();
+        builder.append(reason+" für den ")
+                .append(getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                .append("\n");
+
+        builder.append("Klasse: ").append(getClassName()).append("\n");
+        builder.append("Stunde: ").append(getDefaultHour()).append("\n");
+        builder.append("Fach: ").append(getDefaultSubject()).append("\n");
+        if(getLastEntryUpdate().getNote() != null && !getLastEntryUpdate().getNote().equals("null"))
+            builder.append("Anmerkung: ").append(getLastEntryUpdate().getNote()).append("\n");
+        if(getLastEntryUpdate().getTeacherLong() != null && !getLastEntryUpdate().getTeacherLong().equals("null"))
+            builder.append("Vertreter: ").append(getLastEntryUpdate().getTeacherLong()).append("\n");
+        if(getLastEntryUpdate().getSubject() != null && !getLastEntryUpdate().getSubject().equals("null"))
+            builder.append("Neues Fach: ").append(getLastEntryUpdate().getSubject()).append("\n");
+        if(getLastEntryUpdate().getRoom() != null && !getLastEntryUpdate().getRoom().equals("null"))
+            builder.append("Neuer Raum: ").append(getLastEntryUpdate().getRoom()).append("\n");
+        if(getLastEntryUpdate().getHour() != null && !getLastEntryUpdate().getHour().equals("null"))
+            builder.append("Neue Stunde: ").append(getLastEntryUpdate().getHour()).append("\n");
+        return builder.toString();
+    }
+
 }
