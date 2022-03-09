@@ -70,35 +70,6 @@ public class SQLConnector {
                     "hour TINYINT NOT NULL, " +
                     "FOREIGN KEY (notification_id) REFERENCES notification(notification_id) ON DELETE CASCADE)");
 
-            //OLD....
-/*            executeUpdate("CREATE TABLE IF NOT EXISTS entry(" +
-                    "entry_id INT PRIMARY KEY AUTO_INCREMENT," +
-                    "registration_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                    "last_refresh_timestamp TIMESTAMP NOT NULL," +
-                    "representation_date DATE NOT NULL," +
-                    "class CHAR(6) NOT NULL, " +
-                    "default_hour CHAR(6) NOT NULL, " +
-                    "default_room CHAR(4) NOT NULL, " +
-                    "default_teacher VARCHAR(50) NOT NULL, " +
-                    "default_subject CHAR(4) NOT NULL, " +
-                    "note VARCHAR(50), " +
-                    "new_hour CHAR(6), " +
-                    "new_room CHAR(4), " +
-                    "new_teacher VARCHAR(50), " +
-                    "new_subject CHAR(4), " +
-                    "CONSTRAINT uc_all_needed UNIQUE (" +
-                    "last_refresh_timestamp,  " +
-                    "class,  " +
-                    "default_hour,  " +
-                    "default_room, " +
-                    "default_teacher, " +
-                    "default_subject, " +
-                    "note, " +
-                    "new_hour,  " +
-                    "new_room, " +
-                    "new_teacher, " +
-                    "new_subject));");*/
-
             //Entry - default stuff
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_timestamp(" +
                     "timestamp_id INT PRIMARY KEY AUTO_INCREMENT," +

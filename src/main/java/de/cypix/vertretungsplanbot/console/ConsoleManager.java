@@ -130,21 +130,7 @@ public class ConsoleManager extends Thread{
             }
         }
         if(args.length >= 3){
-      /*      if(args[0].equalsIgnoreCase("write")){
-                String tag = args[1];
-                StringBuilder message = new StringBuilder();
-                for (int i = 2; i < args.length; i++)
-                    message.append(args[i]).append(" ");*//*
-                TasksCheckBot.getJda().openPrivateChannelById(tag).queue(e -> {
-                    e.sendMessage(message.toString()).queue();
-                });*//*
-                for (PrivateChannel privateChannel : TasksCheckBot.getJda().getPrivateChannels()) {
-                    if(privateChannel.getUser().getAsTag().equals(tag)) {
-                        privateChannel.sendMessage(message.toString()).queue();
-                    }
-                }
-                return;
-            }*/
+
         }
         sendHelp();
     }

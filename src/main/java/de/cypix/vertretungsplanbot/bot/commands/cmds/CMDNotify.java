@@ -38,20 +38,5 @@ public class CMDNotify implements TelegramCommand {
 
         VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Bitte wähle einen Bildungsgang").replyMarkup(inlineKeyboard));
 
-/*        for (String className : SQLManager.getAllNotifiesByChatId(chat.id())) {
-            new InlineKeyboardButton(className).callbackData(
-                    new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "add").addData("class", className).build());
-        }*/
-
-
-/*        //send all relevant entries
-        for (VertretungsEntry allRelevantEntriesByClass : SQLManager.getAllRelevantEntriesByClass(args[1])) {
-            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(),
-                    "Neuer eintrag Für den " + allRelevantEntriesByClass.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + "\n" +
-                            "Klasse: " + allRelevantEntriesByClass.getClassName() + "\n" +
-                            "Stunde: " + allRelevantEntriesByClass.getDefaultHour() + "\n" +
-                            "Fach: " + allRelevantEntriesByClass.getDefaultSubject() + "\n" +
-                            "Anmerkung: " + allRelevantEntriesByClass.getNote()));
-        }*/
     }
 }

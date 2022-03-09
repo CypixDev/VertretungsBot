@@ -39,15 +39,6 @@ public class SQLManager {
         query.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
                 .append(entry.getRegistrationTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'), ");
 
-/*
-        if (!SQLManager.exists("entry_timestamp",
-                "timestamp_time",
-                entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
-            SQLManager.insertNewTimeStamp(entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        query.append("(SELECT timestamp_id FROM entry_timestamp WHERE timestamp_time='")
-                .append(entry.getLastRefreshTimeStamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("'), ");
-*/
-
 
         if (!SQLManager.exists("entry_timestamp",
                 "timestamp_time",

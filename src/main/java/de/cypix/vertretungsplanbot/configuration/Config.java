@@ -27,9 +27,7 @@ public class Config {
         // Hier die Standardwerte falls das jeweiligen Attribut nicht in der
         // config.json enthalten ist.
         this.token = "put here your token";
-        this.channelName = "put here your channelname";
         this.sqlPassword = "123456";
-        this.guildName = "Name of you Guild";
         this.sqlHost = "localhost";
         this.sqlUser = "Vertretungsplanbot";
         this.sqlDatabase = "Vertretungsplanbot";

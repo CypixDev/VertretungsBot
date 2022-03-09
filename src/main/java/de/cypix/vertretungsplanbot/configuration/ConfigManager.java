@@ -1,6 +1,5 @@
 package de.cypix.vertretungsplanbot.configuration;
 
-import de.cypix.vertretungsplanbot.console.ConsoleManager;
 import org.apache.log4j.Logger;
 
 public class ConfigManager {
@@ -34,14 +33,7 @@ public class ConfigManager {
     public String getSQLDatabase() {return Config.getInstance().sqlDatabase;}
     public int getSQLPort() {return Config.getInstance().sqlPort;}
 
-
     public boolean isStatingAutomatically(){return Config.getInstance().startAutomatically;}
     public boolean isMaintenance(){return Config.getInstance().maintenance;}
-
-
-
-    public String getChannelName(){return Config.getInstance().channelName;}
-
-    public String getGuildName(){return Config.getInstance().guildName;}
 
 }

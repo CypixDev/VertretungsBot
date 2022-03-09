@@ -100,12 +100,6 @@ public class VertretungsPlanBot {
     private static void setupLogger() {
         try {
             DOMConfigurator.configureAndWatch( "log4j.xml", 60*1000 );
-/*            PatternLayout layout = new PatternLayout( "%d{ISO8601} %-5p [%t] %c: %m%n" );
-            DailyRollingFileAppender fileAppender =
-                    new DailyRollingFileAppender( layout, "logs/MeineLogDatei.log", "'.'yyyy-MM-dd_HH-mm" );
-            logger.addAppender( fileAppender );
-            logger.setLevel( Level.ALL );
-            logger.*/
         } catch( Exception ex ) {
             logger.error(ex);
         }

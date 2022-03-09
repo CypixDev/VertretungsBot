@@ -44,7 +44,8 @@ public class Updater extends Thread {
                                 + getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) +
                                 " und "
                                 + SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
-                    /*if(!getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
+                    /*TODO just update if there are new entries...
+                       if(!getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                             .equals(SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))){
                         //Updating database....
 
@@ -437,96 +438,6 @@ public class Updater extends Thread {
         return LocalDateTime.parse(line, lastRefreshDateFormatter);
     }
 
-    /*  public static String filter(Scanner scanner){ //WORKING BACKUP
-
-          String pattStart = ("<tr style='background-color: #FFFFFF;'>");
-
-          String line = "";
-          String currentDate = "";
-          while(scanner.hasNextLine()) {
-
-              line=scanner.nextLine();
-              if (line.contains(pattStart)) {
-                  line = line.replace("<tr style='background-color: #FFFFFF;'><td style='font-weight: bold; padding: 2px; border: 1px solid #000000;'>", "");
-                  line = line.replace("</td>", "");
-                  logger.info("Klasse: "+line);
-                  line = scanner.nextLine(); //skip "Lehrer"
-
-                  //Stunden
-                  line = scanner.nextLine();
-                  line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                  line = line.replace("</td>", "");
-                  logger.info("Stunden: "+line);
-                  //Raum
-                  line = scanner.nextLine();
-                  line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                  line = line.replace("</td>", "");
-                  logger.info("Raum: "+line);
-                  //Lehrer
-                  line = scanner.nextLine();
-                  line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                  line = line.replace("</td>", "");
-                  logger.info("Lehrer: "+line);
-                  //Fach
-                  line = scanner.nextLine();
-                  line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                  line = line.replace("</td>", "");
-                  logger.info("Fach: "+line);
-                  //Grund
-                  line = scanner.nextLine();
-                  line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                  line = line.replace("</td>", "");
-                  logger.info("Grund: "+line);
-                  //Fach
-                  line = scanner.nextLine();
-                  line = line.replace("<td rowspan='2' style='padding: 2px; border: 1px solid #000000; vertical-align: top;'>", "");
-                  line = line.replace("</td></tr>", "");
-                  logger.info("Aktion: "+line);
-                  line = scanner.nextLine();
-                  line = scanner.nextLine();
-                  line = scanner.nextLine();
-                  if(line.contains(">..<")){
-                      //Fällt aus, kein weiteres lesen nötig
-                  }else{
-                      //Stunden
-                      //line = scanner.nextLine(); did it above...
-                      line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                      line = line.replace("</td>", "");
-                      logger.info("Stunden: "+line);
-                      //Raum
-                      line = scanner.nextLine();
-                      line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                      line = line.replace("</td>", "");
-                      logger.info("Raum: "+line);
-                      //Lehrer
-                      line = scanner.nextLine();
-                      line = line.replace("<td style='font-weight: bold; padding: 2px; border: 1px solid #000000;'>", "");
-                      line = line.replace("</td>", "");
-                      logger.info("Lehrer: "+line);
-                      //Fach
-                      line = scanner.nextLine();
-                      line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                      line = line.replace("</td>", "");
-                      logger.info("Fach: "+line);
-                      //Grund
-                      line = scanner.nextLine();
-                      line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
-                      line = line.replace("</td></tr>", "");
-                      logger.info("Grund: "+line);
-                  }
-                  logger.info();
-                  //Line ende
-              }else if(line.contains("Planabweichungen")){
-                  line = line.replace("<h3 style='font-size: 18px; color: #6666FF;'>", "");
-                  line = line.replace("<br><font size='-1'>", "");
-                  line = line.replace("</h3>", "");
-
-                  logger.info(line);
-              }
-              //line.indexOf()
-          }
-          return "";
-      }*/
     public static void filter() {
         String pattStart = ("<tr style='background-color: #FFFFFF;'>");
         Scanner scanner = new Scanner(System.in);
