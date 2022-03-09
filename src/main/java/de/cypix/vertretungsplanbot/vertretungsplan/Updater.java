@@ -35,7 +35,7 @@ public class Updater extends Thread {
     public void run() {
         try {
             while (keepRunning()) {
-                if(/*LocalDateTime.now().getHour() < 23 && LocalDateTime.now().getHour() >= 1*/true){
+                if(LocalDateTime.now().getHour() < 23 && LocalDateTime.now().getHour() >= 1){
                     try {
                         URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
                         Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
