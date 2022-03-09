@@ -19,11 +19,15 @@ public class KeyboardCallBackBuilder {
         data.put(key, value);
         return this;
     }
+    public KeyboardCallBackBuilder addData(String key, int value){
+        data.put(key, String.valueOf(value));
+        return this;
+    }
 
     public String build(){
-        StringBuilder str = new StringBuilder("type=keyboard").append(";");
+        StringBuilder str = new StringBuilder("type=kb").append(";");
 
-        str.append("callbackType").append("=").append(keyboardCallbackType.ordinal()).append(";");
+        str.append("cType").append("=").append(keyboardCallbackType.ordinal()).append(";");
         str.append("key").append("=").append(key).append(";");
 
         for (Map.Entry<String, String> entry : data.entrySet()) {
