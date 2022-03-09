@@ -67,7 +67,7 @@ public class SQLConnector {
             executeUpdate("CREATE TABLE IF NOT EXISTS remind(" +
                     "remind_id INT PRIMARY KEY AUTO_INCREMENT, " +
                     "notification_id INT NOT NULL, " +
-                    "hour TINYINT NOT NULL, " +
+                    "hour CHAR(6) NOT NULL, " +
                     "FOREIGN KEY (notification_id) REFERENCES notification(notification_id) ON DELETE CASCADE)");
 
             //Entry - default stuff
@@ -222,30 +222,6 @@ public class SQLConnector {
             }
         }
         return false;
-    }
-
-    public ResultSet getResultSetSafely(String query){
-        ResultSet set = null;
-        if (isConnected()) {
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                set = preparedStatement.getResultSet();
-                preparedStatement.close();
-            } catch (SQLException e) {
-                logger.error(e);
-            }
-        }else{
-            reconnect();
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                set = preparedStatement.getResultSet();
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                logger.error(e);
-            }
-        }
-        return set;
     }
 
     @Deprecated
