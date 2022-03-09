@@ -156,7 +156,7 @@ public class SQLConnector {
         }
     }
 
-
+    @Deprecated
     public ResultSet getResultSet(String query) {
         if (isConnected()) {
             try {
@@ -195,7 +195,60 @@ public class SQLConnector {
         return true;
     }
 
+    /*
+    Return true if success
+    Returns false if not successfully
+     */
 
+    public boolean executeUpdateWithFeedBack(String query){
+        if(isConnected()){
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                return true;
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+        }else{
+            reconnect();
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                return true;
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+        }
+        return false;
+    }
+
+    public ResultSet getResultSetSafely(String query){
+        ResultSet set = null;
+        if (isConnected()) {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                set = preparedStatement.getResultSet();
+                preparedStatement.close();
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+        }else{
+            reconnect();
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                set = preparedStatement.getResultSet();
+                preparedStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                logger.error(e);
+            }
+        }
+        return set;
+    }
+
+    @Deprecated
     public void executeUpdate(String qry) {
         if (isConnected()) {
             try {
@@ -216,18 +269,6 @@ public class SQLConnector {
             }
         }
     }
-    public void executeUpdateee(String qry) throws SQLException{
-        if (isConnected()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(qry);
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
-        }else {
-            reconnect();
-                PreparedStatement preparedStatement = connection.prepareStatement(qry);
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
-        }
-    }
 
     public void connect() {
         try {
@@ -237,7 +278,7 @@ public class SQLConnector {
             logger.info("Successfully connected to Database!");
             firstConnected = true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
             firstConnected = false;
         }
     }
@@ -261,23 +302,11 @@ public class SQLConnector {
         return instance;
     }
 
-    private void reconnect(){
-        if(firstConnected){
-            if(!isConnected()){
+    private void reconnect() {
+        if (firstConnected) {
+            if (!isConnected()) {
                 connect();
             }
         }
-    }
-
-    public boolean checkLogin(String user, String password) {
-        ResultSet rs = getResultSet("SELECT * FROM users WHERE username='"+user+"' AND password='"+password+"';");
-        try {
-            if(rs.next())
-                return true;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-
-        return false;
     }
 }
