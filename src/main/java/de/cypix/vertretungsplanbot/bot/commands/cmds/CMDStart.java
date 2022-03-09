@@ -27,13 +27,13 @@ public class CMDStart implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
         if(!SQLManager.isRegistered(chat.id())){
-            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Erfolgreich regestriert!"));
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Erfolgreich registriert!"));
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Wenn du dich für Vertretungen registrieren möchtest, tippe: /notify"));
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Achtung, zusätzliche Stunden werden nicht angezeigt!"));
             SQLManager.insertNewUser(chat.id(), user.firstName(), user.lastName());
             logger.info("New user registered. [name='"+user.lastName()+"', firstname='"+user.firstName()+"', chatId="+chat.id()+"]");
         }else{
-            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Du bist bereits regestriert!\n" +
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Du bist bereits registriert!\n" +
                     "Wenn du hilfe brauchst, benutzte /help"));
         }
 

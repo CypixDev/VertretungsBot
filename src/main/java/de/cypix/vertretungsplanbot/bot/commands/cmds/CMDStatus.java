@@ -14,8 +14,8 @@ public class CMDStatus implements TelegramCommand {
                 "\n" +
                 "Telegrambot ✅\n" +
                 "Updater "+(VertretungsPlanBot.getUpdater().isAlive() ? "✅" : "❌")+"\n" +
+                "Reminder "+(VertretungsPlanBot.getRemindScheduler().isAlive() ? "✅" : "❌")+"\n" +
                 "Datenbank "+(VertretungsPlanBot.getSqlConnector().isConnected() ? "✅" : "❌")+"\n" +
-                "Discord "+"❌ (to do)\n" +
-                "Signal "+"❌ (to do)\n"));
+                "Discord "+"❌ (to do)\n"));
     }
 }
