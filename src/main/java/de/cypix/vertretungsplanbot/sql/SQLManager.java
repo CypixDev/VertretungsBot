@@ -1,6 +1,7 @@
 package de.cypix.vertretungsplanbot.sql;
 
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
+import de.cypix.vertretungsplanbot.remind.Remind;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntryUpdate;
 import org.apache.log4j.Logger;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -484,19 +486,19 @@ public class SQLManager {
                 "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
                         "AND entry.class_id=" + "(SELECT class_id FROM entry_class WHERE class_name='"+className+"')" +
                 "GROUP BY entry.entry_id;");
+        if(rs == null) return new ArrayList<>();
         return getVertretungsEntries(rs);
     }
 
-    public static void insertNewRemind(int chatId, String className, int hour){
-        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO remind(notification_id, hour) VALUES (" +
-                "(SELECT notification_id FROM notification"+
-                "LEFT JOIN user ON user.chat_id = 259699517"+
-                "WHERE notification.class='DI91'), " + hour + ")");
+    public static boolean insertNewRemind(long chatId, String className, String hour){
+        return VertretungsPlanBot.getSqlConnector().executeUpdateWithFeedBack("INSERT INTO remind(notification_id, hour) VALUES (" +
+                "(SELECT notification_id FROM notification "+
+                "WHERE notification.class='"+className+"' AND user_id = (SELECT user_id FROM user WHERE chat_id="+chatId+")), '" + hour + "')");
     }
 
-    public static void insertNewRemind(int notificationId, int hour){
-        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO remind(notification_id, hour) VALUES (" +
-                notificationId+", "+hour);
+    public static boolean insertNewRemind(int notificationId, String hour){
+        return VertretungsPlanBot.getSqlConnector().executeUpdateWithFeedBack("INSERT INTO remind(notification_id, hour) VALUES (" +
+                notificationId+", '"+hour+"'");
     }
 
     public static void deleteEverything(Long chatId) {
@@ -504,18 +506,60 @@ public class SQLManager {
         logger.info("Deleted all data from "+chatId);
     }
 
-    public static List<Integer> getAllReminderByClassAndChatId(String className, long chatId) {
+    public static List<String> getAllReminderByClassAndChatId(String className, long chatId) {
         ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT hour FROM remind " +
                 "INNER JOIN notification ON notification.notification_id = remind.notification_id " +
                 "INNER JOIN user ON user.chat_id = "+ chatId+" " +
-                "WHERE notification.class = '"+className+";");
-        List<Integer> list = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                list.add(rs.getInt("hour"));
+                "WHERE notification.class = '"+className+"';");
+        List<String> list = new ArrayList<>();
+        if(rs != null){
+            try {
+                while (rs.next()) {
+                    list.add(rs.getString("hour"));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public static boolean deleteRemind(Long chatId, String className, String hour) {
+         return (VertretungsPlanBot.getSqlConnector().executeUpdateWithFeedBack("DELETE FROM remind WHERE " +
+                 "notification_id = (SELECT notification_id FROM notification WHERE user_id = "+"" +
+                 "(SELECT user_id FROM user WHERE chat_id="+chatId+") AND class = '"+className+"') AND " +
+                 "hour = '"+hour+"';"));
+    }
+
+    public static List<Remind> getAllRemindsByTime(String currentTime) {
+        List<Remind> list = new ArrayList<>();
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT chat_id, hour, class FROM remind " +
+                "LEFT JOIN notification ON notification.notification_id = remind.notification_id " +
+                "LEFT JOIN user ON user.user_id = notification.user_id " +
+                "WHERE hour='"+currentTime+"' OR hour='T"+currentTime+"'");
+        if(rs != null){
+            try {
+                while (rs.next()) {
+                    list.add(new Remind(rs.getLong("chat_id"), rs.getString("class"), rs.getString("hour")));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
+    public static List<Long> getAllChatIds() {
+        List<Long> list = new ArrayList<>();
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT chat_id FROM user;");
+        if(rs != null){
+            try {
+                while (rs.next()) {
+                    list.add(rs.getLong("chat_id"));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return list;
     }

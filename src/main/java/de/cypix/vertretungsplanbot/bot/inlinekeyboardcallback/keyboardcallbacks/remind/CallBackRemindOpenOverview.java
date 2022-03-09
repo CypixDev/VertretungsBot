@@ -14,27 +14,17 @@ import de.cypix.vertretungsplanbot.sql.SQLManager;
 
 import java.util.HashMap;
 
-public class CallBackRemindOverview implements KeyboardCallback {
-
-    /*
-    Handling all call backs from "page" overview....
-     */
+public class CallBackRemindOpenOverview implements KeyboardCallback {
     @Override
     public boolean handleCallBack(String key, Update update, Chat chat, HashMap<String, String> data) {
         if(!getKey().equalsIgnoreCase(key)) return false;
-
-        String className = data.get("class");
-        long chatId = chat.id();
-
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+        for (String className : SQLManager.getAllNotifiesByChatId(chat.id())) {
+            inlineKeyboard.addRow(new InlineKeyboardButton(className).callbackData(
+                    new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "overviewReminds").addData("class", className).build()));
+        }
 
-        //SQLManager.getAllReminderByClassAndChatId(className, chatId);
-        /*
-          inlineKeyboard.addRow(new InlineKeyboardButton(className).callbackData(
-          new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "overview").addData("class", className).build()));
-         */
-
-        EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Hier die Liste deiner Notifications:")
+        EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Bitte wähle eine Klasse:")
                 .parseMode(ParseMode.HTML)
                 .disableWebPagePreview(true)
                 .replyMarkup(inlineKeyboard);
@@ -46,6 +36,6 @@ public class CallBackRemindOverview implements KeyboardCallback {
 
     @Override
     public String getKey() {
-        return "overview";
+        return "openOverview";
     }
 }

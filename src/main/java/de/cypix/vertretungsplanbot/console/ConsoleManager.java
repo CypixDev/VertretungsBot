@@ -1,6 +1,8 @@
 package de.cypix.vertretungsplanbot.console;
 
+import com.pengrad.telegrambot.request.SendMessage;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
+import de.cypix.vertretungsplanbot.sql.SQLManager;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import org.apache.log4j.Logger;
@@ -67,6 +69,11 @@ public class ConsoleManager extends Thread{
                 //TasksCheckBot.getJda().shutdownNow();
                 System.exit(1);
                 return;
+            }
+            if(args[0].equalsIgnoreCase("notifynewversion")){
+                for (Long allChatId : SQLManager.getAllChatIds()) {
+                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatId, "Es gibt eine neue Version, changelog mit /changelog"));
+                }
             }
         }
         if(args.length == 2){
