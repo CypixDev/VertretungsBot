@@ -3,12 +3,15 @@ package de.cypix.vertretungsplanbot.main;
 import com.pengrad.telegrambot.TelegramBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.delete_all.CallbackDeleteAllConfirmation;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.notify.*;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.remind.*;
 import de.cypix.vertretungsplanbot.bot.listener.BotListener;
 import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
 import de.cypix.vertretungsplanbot.bot.commands.cmds.*;
 import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.console.ConsoleManager;
+import de.cypix.vertretungsplanbot.remind.RemindScheduler;
 import de.cypix.vertretungsplanbot.sql.SQLConnector;
 import de.cypix.vertretungsplanbot.vertretungsplan.Updater;
 import org.apache.log4j.Logger;
@@ -25,6 +28,7 @@ public class VertretungsPlanBot {
     private static ConfigManager configManager;
     private static ConsoleManager consoleManager;
     private static Updater updater;
+    private static RemindScheduler remindScheduler;
     private static final Logger logger = Logger.getRootLogger();
 
     /*
@@ -41,6 +45,7 @@ public class VertretungsPlanBot {
         commandManager = new CommandManager();
         keyBoardCallBackManager = new KeyboardCallbackManager();
         updater = new Updater();
+        remindScheduler = new RemindScheduler();
         consoleManager.start();
 
         //Register things
@@ -50,15 +55,16 @@ public class VertretungsPlanBot {
         if(configManager.isStatingAutomatically()){
             instance.startSQL();
             instance.startBot();
-            instance.startUpdater();
+            instance.startSchedulers();
         }
         if(configManager.isMaintenance()){
             logger.warn("Maintenance is activated");
         }
     }
 
-    private void startUpdater() {
+    private void startSchedulers() {
         getUpdater().start();
+        getRemindScheduler().start();
     }
 
     public void startBot(){
@@ -78,8 +84,10 @@ public class VertretungsPlanBot {
         commandManager.registerCommand("/notifylist", new CMDNotifyList());
         commandManager.registerCommand("/status", new CMDStatus());
         commandManager.registerCommand("/getalldata", new CMDGetAllData());
-        commandManager.registerCommand("/deleteall", new CMDDeleteAll());
+        commandManager.registerCommand("/deletealldata", new CMDDeleteAllData());
         commandManager.registerCommand("/remind", new CMDRemind());
+        commandManager.registerCommand("/resend", new CMDResend());
+        commandManager.registerCommand("/changelog", new CMDChangelog());
     }
 
     private static void registerKeyBoardCallBacks(){
@@ -89,6 +97,18 @@ public class VertretungsPlanBot {
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyAddClass());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyAddClassFinish());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOpenAddOverview());
+
+
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindAddRemind());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindDeleteRemind());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindEnterRemind());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOpenAddRemind());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOverviewReminds());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOverview());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOverviewReminds());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOpenOverview());
+
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.DELETE_ALL, new CallbackDeleteAllConfirmation());
     }
 
 
@@ -124,6 +144,10 @@ public class VertretungsPlanBot {
 
     public static Updater getUpdater() {
         return updater;
+    }
+
+    public static RemindScheduler getRemindScheduler() {
+        return remindScheduler;
     }
 
     public static CommandManager getCommandManager() {
