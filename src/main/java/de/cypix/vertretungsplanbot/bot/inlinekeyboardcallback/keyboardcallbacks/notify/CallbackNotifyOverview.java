@@ -28,8 +28,8 @@ public class CallbackNotifyOverview implements KeyboardCallback {
                 .callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "delete")
                         .addData("class", data.get("class"))
                         .build()));
-        inlineKeyboard.addRow(new InlineKeyboardButton("Erinnerungen").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "overview")
-                .addData("class", data.get("class")).addData("chatId", String.valueOf(chat.id())).build())
+        inlineKeyboard.addRow(new InlineKeyboardButton("Erinnerungen").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "overviewReminds")
+                .addData("class", data.get("class")).build())
                 , new InlineKeyboardButton("Statistiken").callbackData("__"));
 
         EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Übersicht für "+data.get("class"))
