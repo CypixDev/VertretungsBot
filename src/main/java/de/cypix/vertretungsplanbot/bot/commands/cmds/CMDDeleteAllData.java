@@ -19,7 +19,7 @@ public class CMDDeleteAllData implements TelegramCommand {
 
         inlineKeyboard.addRow(
                 new InlineKeyboardButton("Ja").callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.DELETE_ALL, "confirm").addData("decision", "yea").build()),
+                        new KeyboardCallBackBuilder(KeyboardCallbackType.DELETE_ALL, "confirm").addData("decision", "yes").build()),
                 new InlineKeyboardButton("Nein").callbackData(
                         new KeyboardCallBackBuilder(KeyboardCallbackType.DELETE_ALL, "confirm").addData("decision", "no").build()));
 
