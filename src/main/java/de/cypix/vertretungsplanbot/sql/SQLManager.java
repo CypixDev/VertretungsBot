@@ -510,7 +510,7 @@ public class SQLManager {
         ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT hour FROM remind " +
                 "INNER JOIN notification ON notification.notification_id = remind.notification_id " +
                 "INNER JOIN user ON user.chat_id = "+ chatId+" " +
-                "WHERE notification.class = '"+className+"';");
+                "WHERE notification.class = '"+className+"' AND user.user_id = notification.user_id;");
         List<String> list = new ArrayList<>();
         if(rs != null){
             try {

@@ -18,7 +18,8 @@ public class CallBackRemindDeleteRemind implements KeyboardCallback {
         String hour = data.get("hour");
         String className = data.get("class");
 
-        if(SQLManager.deleteRemind(chat.id(), className, hour)){
+        //if(SQLManager.deleteRemind(chat.id(), className, hour)){
+        SQLManager.deleteRemind(chat.id(), className, hour);
             EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(),
                     "Erfolgreich Erinnerung für "+className+" um "+hour+" gelöscht!")
                     .parseMode(ParseMode.HTML)
@@ -26,7 +27,7 @@ public class CallBackRemindDeleteRemind implements KeyboardCallback {
                     .replyMarkup(new InlineKeyboardMarkup());
 
             VertretungsPlanBot.getBot().execute(editMessageText);
-        }else{
+        /*}else{
             EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(),
                     "Ein Fehler ist aufgetreten!")
                     .parseMode(ParseMode.HTML)
@@ -34,7 +35,7 @@ public class CallBackRemindDeleteRemind implements KeyboardCallback {
                     .replyMarkup(new InlineKeyboardMarkup());
 
             VertretungsPlanBot.getBot().execute(editMessageText);
-        }
+        }*/
 
         return true;
     }
