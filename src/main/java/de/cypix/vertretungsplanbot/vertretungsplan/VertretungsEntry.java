@@ -55,20 +55,6 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
         this.defaultSubject = defaultSubject;
     }
 
-    //Just use on insert....
-    public void insertAllNewUpdates() {
-        //load entryId
-        //TODO: Check if it's working fine....
-        entryId = SQLManager.getLastInsertedEntryId();
-        System.out.print("Id: "+entryId);
-/*        if(getNote() != null) SQLManager.insertNewUpdate(UpdateType.NOTE, entryId, note);
-        if(getNewHour() != null) SQLManager.insertNewUpdate(UpdateType.HOUR, entryId, newHour);
-        if(getNewRoom() != null) SQLManager.insertNewUpdate(UpdateType.ROOM, entryId, newRoom);
-        if(getNewTeacher() != null) SQLManager.insertNewUpdate(UpdateType.TEACHER, entryId, getNewTeacherShort()+"__"+getNewTeacherLong());
-        if(getNewSubject() != null) SQLManager.insertNewUpdate(UpdateType.SUBJECT, entryId, newSubject);*/
-
-    }
-
     public int getEntryId() {
         return entryId;
     }

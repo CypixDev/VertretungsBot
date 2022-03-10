@@ -30,26 +30,30 @@ public class BotListener implements UpdatesListener {
                 String message = "";
                 String[] args = {""};
 
-                if (update.message().text() != null) {
-                    logger.info("Received message ["+update.message().chat().id()+"] " + update.message().text());
-                    message = update.message().text();
-                    args = message.split(" ");
-                }
+                if(VertretungsPlanBot.getEnterMessageManager().isEnterMessage(update.message().chat().id())){
+                    VertretungsPlanBot.getEnterMessageManager().end(update.message().text(), update.message().chat().id());
+                }else{
+                    if (update.message().text() != null) {
+                        logger.info("Received message ["+update.message().chat().id()+"] " + update.message().text());
+                        message = update.message().text();
+                        args = message.split(" ");
+                    }
 
-                if(message.startsWith("/")){
-                    //call command
-                    if (SQLManager.isRegistered(update.message().chat().id()) || args[0].equalsIgnoreCase("/start")) {
-                        if (!VertretungsPlanBot.getCommandManager().perform(args[0], update.message().from(), update.message().chat(), update.message(), args)) {
-                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Befehl nicht bekannt!"));
+                    if(message.startsWith("/")){
+                        //call command
+                        if (SQLManager.isRegistered(update.message().chat().id()) || args[0].equalsIgnoreCase("/start")) {
+                            if (!VertretungsPlanBot.getCommandManager().perform(args[0], update.message().from(), update.message().chat(), update.message(), args)) {
+                                VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Befehl nicht bekannt!"));
+                            }
+                            //Eigentlich unnötig glaube ich....
+                        } else
+                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Bitte registriere dich zuerst mit /start"));
+                    }else {
+                        try {
+                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), CleverBot.getAnswer(message)));
+                        } catch (Exception e) {
+                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Nicht bekannt!"));
                         }
-                        //Eigentlich unnötig glaube ich....
-                    } else
-                        VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Bitte registriere dich zuerst mit /start"));
-                }else {
-                    try {
-                        VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), CleverBot.getAnswer(message)));
-                    } catch (Exception e) {
-                        VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Nicht bekannt!"));
                     }
                 }
 

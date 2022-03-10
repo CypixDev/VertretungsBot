@@ -9,6 +9,7 @@ import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.
 import de.cypix.vertretungsplanbot.bot.listener.BotListener;
 import de.cypix.vertretungsplanbot.bot.commands.CommandManager;
 import de.cypix.vertretungsplanbot.bot.commands.cmds.*;
+import de.cypix.vertretungsplanbot.bot.remind.EnterRemindManager;
 import de.cypix.vertretungsplanbot.configuration.ConfigManager;
 import de.cypix.vertretungsplanbot.console.ConsoleManager;
 import de.cypix.vertretungsplanbot.remind.RemindScheduler;
@@ -29,6 +30,7 @@ public class VertretungsPlanBot {
     private static ConsoleManager consoleManager;
     private static Updater updater;
     private static RemindScheduler remindScheduler;
+    private static EnterRemindManager enterRemindManager;
     private static final Logger logger = Logger.getRootLogger();
 
     /*
@@ -45,6 +47,7 @@ public class VertretungsPlanBot {
         commandManager = new CommandManager();
         keyBoardCallBackManager = new KeyboardCallbackManager();
         updater = new Updater();
+        enterRemindManager = new EnterRemindManager();
         remindScheduler = new RemindScheduler();
         consoleManager.start();
 
@@ -107,6 +110,7 @@ public class VertretungsPlanBot {
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOverview());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOverviewReminds());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOpenOverview());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOpenOverviewReminds());
 
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.DELETE_ALL, new CallbackDeleteAllConfirmation());
     }
@@ -160,5 +164,9 @@ public class VertretungsPlanBot {
 
     public static KeyboardCallbackManager getKeyboardCallbackManager() {
         return keyBoardCallBackManager;
+    }
+
+    public static EnterRemindManager getEnterMessageManager() {
+        return enterRemindManager;
     }
 }

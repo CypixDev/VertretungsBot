@@ -58,7 +58,11 @@ public class CallBackRemindOpenAddRemind implements KeyboardCallback {
                         .addData("hour", "T22:00")
                         .build()));
 
-        inlineKeyboard.addRow(new InlineKeyboardButton("Selber eingeben").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "enterRemind")
+        inlineKeyboard.addRow(new InlineKeyboardButton(("Zurück")).callbackData(
+                new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "openOverviewReminds")
+                        .addData("class", className)
+                        .build()),
+                new InlineKeyboardButton("Selber eingeben").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "enterRemind")
                 .addData("class", className)
                 .build()));
         return inlineKeyboard;

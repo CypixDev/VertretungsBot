@@ -60,14 +60,12 @@ public class Updater extends Thread {
                             Die Neue Liste durchgehen und schauen welche der Alten einträge nicht mehr drinnen sind
                          */
 
-                        //TODO: check if something is deleted
                         if (newEntries.size() == oldEntries.size()) {
                             logger.info("Anzahl einträge gleich geblieben");
                         } else if (newEntries.size() > oldEntries.size()) {
                             logger.info("Es gibt neue einträge!");
                         } else {
                             logger.info("Es sind weniger einträge...");
-                            //TODO: Check lost entries
                         }
 
 
@@ -102,20 +100,11 @@ public class Updater extends Thread {
                                         //Nothing to do....
                                         break;
                                     case 2://Aktuallisieren -- Defaults same but not defaults not
-                                    /*TODO: check....
-                                    if(!getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
-                                            .equals(SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))){
-                                     */
-/*                                    logger.info("COMPARE: Defaults");
-                                    logger.info(oldEntry.toString());
-                                    logger.info(newEntry.toString());
-                                    logger.info();*/
 
                                         exist = true;
                                         oldEntriesLeft.remove(oldEntry);
                                         SQLManager.insertNewUpdate(oldEntry.getEntryId(), newEntry.getLastEntryUpdate());
-                                        //SQLManager.updateEntry(newEntry);
-                                        //TODO: Check what has changed and change it
+
                                         if(DEBUG) logger.info("entry updated!");
 
                                         //Just build one time for all notifications

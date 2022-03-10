@@ -21,7 +21,6 @@ public class SQLManager {
 
 
     public static void insertNewEntry(VertretungsEntry entry) {
-        //TODO: Fix String builder with "," and "'"
 
         StringBuilder query = new StringBuilder("INSERT INTO entry(");
         query.append("registration_timestamp_id,");

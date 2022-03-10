@@ -32,7 +32,7 @@ public class CallBackRemindOverviewReminds implements KeyboardCallback {
         if(list.isEmpty()) {
             //Open add page
 
-            EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Erinnerung  hinzufügen:")
+            EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Erinnerung hinzufügen:")
                     .parseMode(ParseMode.HTML)
                     .disableWebPagePreview(true)
                     .replyMarkup(CallBackRemindOpenAddRemind.getKeyBoard(className));
@@ -40,19 +40,9 @@ public class CallBackRemindOverviewReminds implements KeyboardCallback {
             VertretungsPlanBot.getBot().execute(editMessageText);
 
         }else{
-            for (String hour : list) {
-                inlineKeyboard.addRow(new InlineKeyboardButton(hour).callbackData(
-                        new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "deleteRemind")
-                                .addData("class", className)
-                                .addData("hour", hour).build()));
-            }
-            inlineKeyboard.addRow(new InlineKeyboardButton("Zurück").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "openOverview")
-                            .build()),
-                    new InlineKeyboardButton("Hinzufügen").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "openAddRemind")
-                            .addData("class", className)
-                            .build()));
+            inlineKeyboard = getKeyBoard(list, className);
 
-            EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Hier die Liste deiner Erinnerungen:")
+            EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Hier die Liste deiner Erinnerungen für "+className+":")
                     .parseMode(ParseMode.HTML)
                     .disableWebPagePreview(true)
                     .replyMarkup(inlineKeyboard);
@@ -66,5 +56,22 @@ public class CallBackRemindOverviewReminds implements KeyboardCallback {
     @Override
     public String getKey() {
         return "overviewReminds";
+    }
+
+    public static InlineKeyboardMarkup getKeyBoard(List<String> list, String className){
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+
+        for (String hour : list) {
+            inlineKeyboard.addRow(new InlineKeyboardButton(hour).callbackData(
+                    new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "deleteRemind")
+                            .addData("class", className)
+                            .addData("hour", hour).build()));
+        }
+        inlineKeyboard.addRow(new InlineKeyboardButton("Zurück").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "openOverview")
+                        .build()),
+                new InlineKeyboardButton("Hinzufügen").callbackData(new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "openAddRemind")
+                        .addData("class", className)
+                        .build()));
+        return inlineKeyboard;
     }
 }
