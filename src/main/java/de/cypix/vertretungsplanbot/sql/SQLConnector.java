@@ -86,14 +86,14 @@ public class SQLConnector {
                     "hour_name CHAR(6) NOT NULL)");
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_teacher(" +
                     "teacher_id INT PRIMARY KEY AUTO_INCREMENT," +
-                    "teacher_short CHAR(2) NOT NULL," +
+                    "teacher_short CHAR(3) NOT NULL," +
                     "teacher_name VARCHAR(50) NOT NULL)");
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_subject(" +
                     "subject_id INT PRIMARY KEY AUTO_INCREMENT," +
                     "subject_name CHAR(4) NOT NULL)");
             executeUpdate("CREATE TABLE IF NOT EXISTS entry_note(" +
                     "note_id INT PRIMARY KEY AUTO_INCREMENT," +
-                    "note_name VARCHAR(50) NOT NULL)");
+                    "note_name VARCHAR(255) NOT NULL)");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS entry("+
                     "entry_id INT PRIMARY KEY AUTO_INCREMENT," +
