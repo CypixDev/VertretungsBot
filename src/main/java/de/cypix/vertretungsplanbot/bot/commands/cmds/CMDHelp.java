@@ -15,8 +15,8 @@ public class CMDHelp implements TelegramCommand {
         VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Hier ist deine Hilfe:\n" +
                 "➡️ Benutzte /notify um Benachrichtigungen zu aktivieren\n" +
                 "➡️ Wenn du /notifylist benutzt, kannst du alle Benachrichtigungen sehen und bearbeiten\n" +
-                "➡️ Wenn du dich zusätzlich Erinnern lassen möchtest, verwende: /remind \n" +
-                "➡️ Du möchstest alle einträge nochmal Gesendet bekommen ? -> /resend \n" +
+                "➡️ Wenn du dich zusätzlich erinnern lassen möchtest, verwende: /remind \n" +
+                "➡️ Du möchstest alle Einträge nochmal Gesendet bekommen ? -> /resend \n" +
                 "➡️ Falls du alle gespeicherten personenbezogenen Daten haben willst, verwende /getalldata\n" +
                 "➡️ Alle Daten kannst du mit /deletealldata löschen\n" +
                 "➡️ Mit /status bekommst du den Status der verschiedenen Systeme\n\n" +
