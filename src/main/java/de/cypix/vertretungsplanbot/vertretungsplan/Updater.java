@@ -281,15 +281,22 @@ public class Updater extends Thread {
                 //Fach
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
+                line = line.replace("&ouml;", "ö");
                 line = line.replace("&auml;", "ä");
+                line = line.replace("&Auml;;", "Ä");
+                line = line.replace("&uuml;", "ü");
                 line = line.replace("<td rowspan='2' style='padding: 2px; border: 1px solid #000000; vertical-align: top;'>", "");
                 line = line.replace("</td></tr>", "");
-                if(DEBUG) logger.info("Aktion: " + line);
+                if(DEBUG) logger.info("Anmerkung: " + line);
+
                 String note = line;
                 line = scanner.nextLine();
                 line = scanner.nextLine();
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
+                line = line.replace("&ouml;", "ö");
+                line = line.replace("&auml;", "ä");
+                line = line.replace("&uuml;", "ü");
                 if (line.contains(">.246485645.<")) {
                     //Fällt aus, kein weiteres lesen nötig
                 } else {
