@@ -561,4 +561,8 @@ public class SQLManager {
         }
         return list;
     }
+
+    public static void deleteEntry(int entryId) {
+        VertretungsPlanBot.getSqlConnector().executeUpdateWithFeedBack("DELETE FROM entry WHERE entry_id="+entryId);
+    }
 }

@@ -173,6 +173,7 @@ public class Updater extends Thread {
                                         "Datum: "+entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))+"\n" +
                                         "Klasse: "+entry.getClassName()+"\n" +
                                         "Stunden: "+entry.getDefaultHour()));
+                                SQLManager.deleteEntry(entry.getEntryId());
                             }
                         }
 
