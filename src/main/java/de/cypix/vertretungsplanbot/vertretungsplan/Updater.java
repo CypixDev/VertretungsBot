@@ -26,8 +26,6 @@ public class Updater extends Thread {
     public static boolean simulateUpdate = false;
     public static boolean simulateAdd = false;
 
-    private static final boolean DEBUG = false;
-
     private static final Logger logger = Logger.getLogger(Updater.class);
 
 
@@ -40,7 +38,7 @@ public class Updater extends Thread {
                         URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
                         Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
 
-                        if(DEBUG) logger.info("Vergleiche: "
+                        logger.debug("Vergleiche: "
                                 + getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) +
                                 " und "
                                 + SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
@@ -61,11 +59,11 @@ public class Updater extends Thread {
                          */
 
                         if (newEntries.size() == oldEntries.size()) {
-                            logger.info("Anzahl einträge gleich geblieben");
+                            logger.debug("Anzahl einträge gleich geblieben");
                         } else if (newEntries.size() > oldEntries.size()) {
-                            logger.info("Es gibt neue einträge!");
+                            logger.debug("Es gibt neue einträge!");
                         } else {
-                            logger.info("Es sind weniger einträge...");
+                            logger.debug("Es sind weniger einträge...");
                         }
 
 
@@ -105,7 +103,7 @@ public class Updater extends Thread {
                                         oldEntriesLeft.remove(oldEntry);
                                         SQLManager.insertNewUpdate(oldEntry.getEntryId(), newEntry.getLastEntryUpdate());
 
-                                        if(DEBUG) logger.info("entry updated!");
+                                        logger.info("Entry updated["+newEntry.toString()+"\n Update: "+newEntry.getLastEntryUpdate().toString()+"]\n");
 
                                         //Just build one time for all notifications
                                         StringBuilder builder = new StringBuilder();
@@ -127,6 +125,7 @@ public class Updater extends Thread {
                                         if(newEntry.getLastEntryUpdate().getHour() != null && !newEntry.getLastEntryUpdate().getHour().equals("null"))
                                             builder.append("Neue Stunde: ").append(newEntry.getLastEntryUpdate().getHour()).append("\n");
 
+
                                         for (Long chatId : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                             VertretungsPlanBot.getBot().execute(new SendMessage(chatId, builder.toString()));
                                         }
@@ -139,7 +138,7 @@ public class Updater extends Thread {
                                 if(!newEntry.getClassName().equals("TEST")){ //For simulation....
                                     SQLManager.insertNewEntry(newEntry);
                                 }
-                                logger.info("Added new entry!");
+                                logger.info("Added new entry["+newEntry.toString()+"\n Update: "+newEntry.getLastEntryUpdate().toString()+"]\n");
                                 for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
                                     StringBuilder builder = new StringBuilder();
                                     builder.append("Neuer Eintrag für den ")
@@ -212,7 +211,7 @@ public class Updater extends Thread {
     }
 
     public static List<VertretungsEntry> filter(Scanner scanner) {
-        logger.info("Starting filtering....");
+        logger.debug("Starting filtering....");
         String pattStart = ("<tr style='background-color: #FFFFFF;'>");
         List<VertretungsEntry> list = new ArrayList<>();
 
@@ -223,7 +222,7 @@ public class Updater extends Thread {
             if (line.contains(pattStart)) {
                 line = line.replace("<tr style='background-color: #FFFFFF;'><td style='font-weight: bold; padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                if(DEBUG) logger.info("Klasse: " + line);
+                logger.debug("Klasse: " + line);
                 String defaultClass = line;
                 line = scanner.nextLine(); //skip "Lehrer"
                 line = line.replace("&nbsp;", " ");
@@ -234,7 +233,7 @@ public class Updater extends Thread {
 
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                if(DEBUG) logger.info("Stunden: " + line);
+                logger.debug("Stunden: " + line);
                 String defaultHour = line;
 
                 //Raum
@@ -242,7 +241,7 @@ public class Updater extends Thread {
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                if(DEBUG) logger.info("Raum: " + line);
+                logger.debug("Raum: " + line);
                 String defaultRoom = line;
 
                 //Lehrer
@@ -253,21 +252,21 @@ public class Updater extends Thread {
                 line = line.replace("&uuml;", "ü");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                if(DEBUG) logger.info("Lehrer: " + line);
+                logger.debug("Lehrer: " + line);
                 String defaultTeacher = line;
                 //Fach
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                if(DEBUG) logger.info("Fach: " + line);
+                logger.debug("Fach: " + line);
                 String defaultSubject = line;
                 //Grund
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
                 line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                 line = line.replace("</td>", "");
-                if(DEBUG) logger.info("Grund: " + line);
+                logger.debug("Grund: " + line);
                 //Fach
                 line = scanner.nextLine();
                 line = line.replace("&nbsp;", " ");
@@ -277,7 +276,7 @@ public class Updater extends Thread {
                 line = line.replace("&uuml;", "ü");
                 line = line.replace("<td rowspan='2' style='padding: 2px; border: 1px solid #000000; vertical-align: top;'>", "");
                 line = line.replace("</td></tr>", "");
-                if(DEBUG) logger.info("Anmerkung: " + line);
+                logger.debug("Anmerkung: " + line);
 
                 String note = line;
                 line = scanner.nextLine();
@@ -294,14 +293,14 @@ public class Updater extends Thread {
                     //line = scanner.nextLine(); did it above...
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    if(DEBUG) logger.info("Stunden: " + line);
+                    logger.debug("Stunden: " + line);
                     String newHour = line;
                     //Raum
                     line = scanner.nextLine();
                     line = line.replace("&nbsp;", " ");
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    if(DEBUG) logger.info("Raum: " + line);
+                    logger.debug("Raum: " + line);
                     String newRoom = line;
                     //Lehrer
                     line = scanner.nextLine();
@@ -311,21 +310,21 @@ public class Updater extends Thread {
                     line = line.replace("&uuml;", "ü");
                     line = line.replace("<td style='font-weight: bold; padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    if(DEBUG) logger.info("Lehrer: " + line);
+                    logger.debug("Lehrer: " + line);
                     String newTeacher = line;
                     //Fach
                     line = scanner.nextLine();
                     line = line.replace("&nbsp;", " ");
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td>", "");
-                    if(DEBUG) logger.info("Fach: " + line);
+                    logger.debug("Fach: " + line);
                     String newSubject = line;
                     //Grund
                     line = scanner.nextLine();
                     line = line.replace("&nbsp;", " ");
                     line = line.replace("<td style='padding: 2px; border: 1px solid #000000;'>", "");
                     line = line.replace("</td></tr>", "");
-                    if(DEBUG) logger.info("Grund: " + line);
+                    logger.debug("Grund: " + line);
 
                     //Adding entry full
 
@@ -391,7 +390,7 @@ public class Updater extends Thread {
 
                 //LocalDate.parse(tmp, representationDateFormatter);
                 representationDate = LocalDate.parse(tmp, representationDateFormatter);
-                if(DEBUG) logger.info("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
+                logger.debug("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
 
                 line = line.split(": ")[1];
 
@@ -425,7 +424,7 @@ public class Updater extends Thread {
 
         //LocalDate.parse(tmp, representationDateFormatter);
         representationDate = LocalDate.parse(tmp, representationDateFormatter);
-        if(DEBUG) logger.info("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
+        logger.debug("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
 
         line = line.split(": ")[1];
 
@@ -534,13 +533,13 @@ public class Updater extends Thread {
                 String tmp = line.split(" - ")[0];
 
                 LocalDate.parse(tmp, representationDateFormatter);
-                if(DEBUG) logger.info("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
+                logger.debug("Für den " + LocalDate.parse(tmp, representationDateFormatter).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN) + " gilt:");
 
                 line = line.split(": ")[1];
 
-                logger.info("Zuletzt aktuallisiert am um: " + LocalDateTime.parse(line, lastRefreshDateFormatter).format(lastRefreshDateFormatter));
+                logger.debug("Zuletzt aktuallisiert am um: " + LocalDateTime.parse(line, lastRefreshDateFormatter).format(lastRefreshDateFormatter));
 
-                logger.info(line);
+                logger.debug(line);
             }
             //line.indexOf()
         }

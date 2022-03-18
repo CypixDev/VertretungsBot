@@ -152,6 +152,9 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
                 ", defaultSubject='" + defaultSubject + '\'' +
                 '}';
     }
+
+
+
     public String toStringDefaults(){
         return "VertretungsEntry{" +
                 ", representationDate=" + representationDate +
