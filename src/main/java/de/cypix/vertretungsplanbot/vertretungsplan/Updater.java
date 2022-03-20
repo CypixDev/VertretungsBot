@@ -38,10 +38,6 @@ public class Updater extends Thread {
                         URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
                         Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
 
-                        logger.debug("Vergleiche: "
-                                + getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) +
-                                " und "
-                                + SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
                     /*TODO just update if there are new entries...
                        if(!getLastRefresh(scanner).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                             .equals(SQLManager.getLastRegisteredRefresh().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))){
@@ -356,7 +352,7 @@ public class Updater extends Thread {
                         Bspw.: Es kann sein das der gleiche lehrer in der 1..2 und 3..4 dran kommt und dann
                             ist die erste leiste exakt gleich....
                          */
-                        logger.info("Additional hour is ignored for "+entry.getClassName());
+                        logger.debug("Additional hour is ignored for "+entry.getClassName());
                     }
 
                 }
@@ -394,7 +390,7 @@ public class Updater extends Thread {
 
                 line = line.split(": ")[1];
 
-                logger.info("Zuletzt aktuallisiert am um: " + LocalDateTime.parse(line, lastRefreshDateFormatter).format(lastRefreshDateFormatter));
+                logger.debug("Zuletzt aktuallisiert am um: " + LocalDateTime.parse(line, lastRefreshDateFormatter).format(lastRefreshDateFormatter));
                 lastRefreshTimeStamp = LocalDateTime.parse(line, lastRefreshDateFormatter);
                 //logger.info(line);
                 //NOT NEEDED ???currentDate = line;

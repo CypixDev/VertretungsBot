@@ -28,7 +28,7 @@
     </appender>
 
     <root>
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="console" />
         <appender-ref ref="RollingAppender" />
     </root>

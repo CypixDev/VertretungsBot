@@ -192,6 +192,18 @@ public class SQLManager {
         }
         return -1;
     }
+    public static LocalDateTime getNewestEntryUpdateTimestamp(int entryId) {
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT entry_timestamp.timestamp_time FROM entry_update " +
+                "LEFT JOIN entry_timestamp ON entry_timestamp.id = entry_update.registration_timestamp_id" +
+                "WHERE entry_id="+entryId+" " +
+                "ORDER BY registration_timestamp_id DESC LIMIT 1");
+        try {
+            if(rs.next()) return rs.getTimestamp("entry_timestamp.timestamp_time").toLocalDateTime();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Deprecated
     public static void insertNewUpdate(UpdateType type, int entryId, String value){
@@ -363,22 +375,6 @@ public class SQLManager {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Deprecated //Not checked....
-    public static LocalDateTime getLastRegisteredRefresh() {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT last_refresh_timestamp FROM entry ORDER BY last_refresh_timestamp DESC LIMIT 1");
-        try {
-            if (rs != null) {
-                if (rs.next()) {
-                    return rs.getTimestamp("last_refresh_timestamp").toLocalDateTime();
-                }
-            }
-        } catch (SQLException e) {
-            logger.info("Returning now-1day because no entries...");
-            return LocalDateTime.now().minusDays(1);
-        }
-        return LocalDateTime.now().minusDays(1);
     }
 
 
