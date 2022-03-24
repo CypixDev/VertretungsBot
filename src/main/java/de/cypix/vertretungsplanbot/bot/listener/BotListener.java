@@ -49,11 +49,7 @@ public class BotListener implements UpdatesListener {
                         } else
                             VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Bitte registriere dich zuerst mit /start"));
                     }else {
-                        try {
-                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), CleverBot.getAnswer(message)));
-                        } catch (Exception e) {
-                            VertretungsPlanBot.getBot().execute(new SendMessage(update.message().chat().id(), "Nicht bekannt!"));
-                        }
+                        VertretungsPlanBot.getCleverBotManager().handleMessage(update.message().chat().id(), message);
                     }
                 }
 

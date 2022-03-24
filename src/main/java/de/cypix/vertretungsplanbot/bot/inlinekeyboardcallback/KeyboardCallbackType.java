@@ -2,7 +2,7 @@ package de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback;
 
 public enum KeyboardCallbackType {
 
-    NOTIFY, SETTING, REMIND, DELETE_ALL;
+    NOTIFY, SETTING, REMIND, DELETE_ALL, CLEVERBOT;
 
     public static KeyboardCallbackType valueOf(int id){
         for (KeyboardCallbackType value : values()) {

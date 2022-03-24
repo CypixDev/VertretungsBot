@@ -312,15 +312,24 @@ public class SQLManager {
             if (rs != null && rs.next()) {
                 list.add("Vorname: " + rs.getString("user_first_name"));
                 list.add("Nachname: " + rs.getString("user_last_name"));
-                list.add("Username: " + rs.getString("user_name"));
+                list.add("Beitritt: "+rs.getTimestamp("registration_timestamp").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        list.add("Alle notifications:");
+        list.add(" ");
+        list.add("Alle notifications & reminds:");
         for (String s : getAllNotifiesByChatId(chatId)) {
-            list.add("- " + s);
+            List<String> reminds = SQLManager.getAllReminderByClassAndChatId(s, chatId);
+            if(reminds.isEmpty()){
+                list.add("- " + s);
+            }else{
+                list.add("- "+s);
+                for (String remind : reminds) {
+                    list.add("  - "+remind);
+                }
+            }
         }
         return list;
     }
@@ -328,6 +337,7 @@ public class SQLManager {
     public static void deleteNotification(long chatId, String className) {
         VertretungsPlanBot.getSqlConnector().executeUpdate("DELETE FROM notification WHERE user_id=(SELECT user_id FROM user WHERE chat_id=" + chatId + ") AND class='" + className + "';");
     }
+
 
     @NotNull
     private static List<VertretungsEntry> getVertretungsEntries(ResultSet rs) {
@@ -561,4 +571,20 @@ public class SQLManager {
     public static void deleteEntry(int entryId) {
         VertretungsPlanBot.getSqlConnector().executeUpdateWithFeedBack("DELETE FROM entry WHERE entry_id="+entryId);
     }
+
+    public static boolean hasAcceptedCleverBot(Long chatId){
+        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT clever_bot_agree.user_id FROM clever_bot_agree " +
+                "LEFT JOIN user ON user.user_id = clever_bot_agree.user_id " +
+                "WHERE user.chat_id = "+chatId+";");
+        try {
+            if (rs.next()) return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public static void agreeCleverBot(Long chatId){
+        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO clever_bot_agree(user_id) VALUES ((SELECT user_id FROM user WHERE chat_id="+chatId+"));");
+    }
+
 }

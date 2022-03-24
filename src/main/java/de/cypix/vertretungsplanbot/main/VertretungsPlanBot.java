@@ -1,8 +1,10 @@
 package de.cypix.vertretungsplanbot.main;
 
 import com.pengrad.telegrambot.TelegramBot;
+import de.cypix.vertretungsplanbot.bot.cleverbot.CleverBotManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
+import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.cleverbot.CallbackCleverBotAgree;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.delete_all.CallbackDeleteAllConfirmation;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.notify.*;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.remind.*;
@@ -31,6 +33,7 @@ public class VertretungsPlanBot {
     private static Updater updater;
     private static RemindScheduler remindScheduler;
     private static EnterRemindManager enterRemindManager;
+    private static CleverBotManager cleverBotManager;
     private static final Logger logger = Logger.getRootLogger();
 
     /*
@@ -48,6 +51,7 @@ public class VertretungsPlanBot {
         keyBoardCallBackManager = new KeyboardCallbackManager();
         updater = new Updater();
         enterRemindManager = new EnterRemindManager();
+        cleverBotManager = new CleverBotManager();
         remindScheduler = new RemindScheduler();
         consoleManager.start();
 
@@ -113,6 +117,8 @@ public class VertretungsPlanBot {
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindOpenOverviewReminds());
 
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.DELETE_ALL, new CallbackDeleteAllConfirmation());
+
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.CLEVERBOT, new CallbackCleverBotAgree());
     }
 
 
@@ -168,5 +174,9 @@ public class VertretungsPlanBot {
 
     public static EnterRemindManager getEnterMessageManager() {
         return enterRemindManager;
+    }
+
+    public static CleverBotManager getCleverBotManager() {
+        return cleverBotManager;
     }
 }

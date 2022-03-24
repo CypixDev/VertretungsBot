@@ -172,8 +172,9 @@ public class Updater extends Thread {
                             }
                         }
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (Exception e) {
+                        logger.error(e);
+                        VertretungsPlanBot.getBot().execute(new SendMessage(259699517, "Error in Updater.... pls CHECK ME!!!!\n"+e.getMessage()));
                     }
 
                     long chatId = 259699517; //Chat id von Pius
@@ -185,7 +186,7 @@ public class Updater extends Thread {
                 }
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -438,7 +439,7 @@ public class Updater extends Thread {
             scanner = new Scanner(new InputStreamReader(url.openStream()));
             Updater.filter(scanner);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
 
         String line = "";

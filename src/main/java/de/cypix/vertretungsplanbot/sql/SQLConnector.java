@@ -55,7 +55,8 @@ public class SQLConnector {
                     "chat_id LONG, " +
                     "user_name VARCHAR(50), " +
                     "user_first_name VARCHAR(50), " +
-                    "user_last_name VARCHAR(50));");
+                    "user_last_name VARCHAR(50)," +
+                    "registration_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS notification(" +
                     "notification_id INT PRIMARY KEY AUTO_INCREMENT, " +
@@ -153,6 +154,13 @@ public class SQLConnector {
                     "subject_id INT," +
                     "FOREIGN KEY (entry_update_id) REFERENCES entry_update(entry_update_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (subject_id) REFERENCES entry_subject(subject_id));");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS clever_bot_agree(user_id INT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE)");
+            executeUpdate("CREATE TABLE IF NOT EXISTS clever_bot_log(user_id INT NOT NULL," +
+                    "registration_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                    "message VARCHAR(255) NOT NULL," +
+                    "answer VARCHAR(255) NOT NULL," +
+                    "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE)");
         }
     }
 
