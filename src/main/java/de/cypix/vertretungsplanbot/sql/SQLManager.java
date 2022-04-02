@@ -7,8 +7,10 @@ import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntryUpdate;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -74,13 +76,26 @@ public class SQLManager {
     }
 
     public static int getLastInsertedEntryId(){
-        ResultSet set = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT LAST_INSERT_ID(entry_id) AS entry_id FROM entry ORDER BY entry_id DESC LIMIT 1;");
+
+        int lastInsertedId = -1;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if(set.next()) return set.getInt("entry_id");
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT LAST_INSERT_ID(entry_id) AS entry_id FROM entry ORDER BY entry_id DESC LIMIT 1;");
+                try {
+                    if(resultSet.next())
+                        lastInsertedId = resultSet.getInt("entry_id");
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return -1;
+        return lastInsertedId;
     }
 
     private static void insertNewNote(String note) {
@@ -124,6 +139,28 @@ public class SQLManager {
                 "class='" + entry.getClassName() + "' " +
                 "AND " +
                 "default_hour='" + entry.getDefaultHour() + "';");
+    }
+
+    public static String getNameByChatId(long chatId){
+        String name = null;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT user_first_name FROM user WHERE chat_id="+chatId);
+                try {
+                    if(resultSet.next())
+                        name = resultSet.getString("user_first_name");
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
+        }
+        return name;
     }
 
     public static void insetNewUpdate(UpdateType type, VertretungsEntry entry){
@@ -183,26 +220,51 @@ public class SQLManager {
     }
 
     private static int getNewestEntryUpdateId(int entryId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT entry_update_id FROM entry_update WHERE entry_id="+entryId+" " +
-                "ORDER BY registration_timestamp_id DESC LIMIT 1");
+        int newestEntryUpdateId = -1;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if(rs.next()) return rs.getInt("entry_update_id");
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT entry_update_id FROM entry_update WHERE entry_id="+entryId+
+                        " ORDER BY registration_timestamp_id DESC LIMIT 1");
+                try {
+                    if(resultSet.next())
+                        newestEntryUpdateId = resultSet.getInt("entry_update_id");
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return -1;
+        return newestEntryUpdateId;
     }
     public static LocalDateTime getNewestEntryUpdateTimestamp(int entryId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT entry_timestamp.timestamp_time FROM entry_update " +
-                "LEFT JOIN entry_timestamp ON entry_timestamp.id = entry_update.registration_timestamp_id" +
-                "WHERE entry_id="+entryId+" " +
-                "ORDER BY registration_timestamp_id DESC LIMIT 1");
+        LocalDateTime newestEntryUpdateTimestamp = null;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if(rs.next()) return rs.getTimestamp("entry_timestamp.timestamp_time").toLocalDateTime();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT entry_timestamp.timestamp_time FROM entry_update" +
+                        " LEFT JOIN entry_timestamp ON entry_timestamp.id = entry_update.registration_timestamp_id" +
+                        " WHERE entry_id="+entryId+
+                        " ORDER BY registration_timestamp_id DESC LIMIT 1");
+                try {
+                    if(resultSet.next())
+                        newestEntryUpdateTimestamp = resultSet.getTimestamp("entry_timestamp.timestamp_time").toLocalDateTime();
+
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return null;
+        return newestEntryUpdateTimestamp;
     }
 
     @Deprecated
@@ -242,94 +304,141 @@ public class SQLManager {
     }
 
     public static List<VertretungsEntry> getAllRelevantEntries() {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet(
-                "SELECT entry.entry_id AS entry_id, register_datetime.timestamp_time AS registration_timestamp, " +
-                        "representation_date.timestamp_time AS representation_date, entry_class.class_name AS class, default_hour.hour_name AS default_hour, " +
-                        "default_room.room_name AS default_room, default_teacher.teacher_name AS default_teacher_long, default_teacher.teacher_short AS default_teacher_short, default_subject.subject_name AS default_subject " +
-                        "FROM entry " +
-                        "" +
-                        "LEFT JOIN entry_timestamp AS register_datetime ON entry.registration_timestamp_id = register_datetime.timestamp_id " +
-                        "LEFT JOIN entry_timestamp AS representation_date ON entry.representation_date_id = representation_date.timestamp_id " +
-                        "" +
-                        "LEFT JOIN entry_class ON entry.class_id = entry_class.class_id " +
-                        "" +
-                        "LEFT JOIN entry_hour AS default_hour ON entry.default_hour_id = default_hour.hour_id " +
-                        "LEFT JOIN entry_room AS default_room ON entry.default_room_id = default_room.room_id " +
-                        "LEFT JOIN entry_teacher AS default_teacher ON entry.default_teacher_id = default_teacher.teacher_id " +
-                        "LEFT JOIN entry_subject AS default_subject ON entry.default_subject_id = default_subject.subject_id " +
-                        "" +
-                        "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
-                        "GROUP BY entry.entry_id; "
-        );
-        return getVertretungsEntries(rs);
+        List<VertretungsEntry> list = new ArrayList<>();
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT entry.entry_id AS entry_id, register_datetime.timestamp_time AS registration_timestamp, " +
+                                "representation_date.timestamp_time AS representation_date, entry_class.class_name AS class, default_hour.hour_name AS default_hour, " +
+                                "default_room.room_name AS default_room, default_teacher.teacher_name AS default_teacher_long, default_teacher.teacher_short AS default_teacher_short, default_subject.subject_name AS default_subject " +
+                                "FROM entry " +
+                                "" +
+                                "LEFT JOIN entry_timestamp AS register_datetime ON entry.registration_timestamp_id = register_datetime.timestamp_id " +
+                                "LEFT JOIN entry_timestamp AS representation_date ON entry.representation_date_id = representation_date.timestamp_id " +
+                                "" +
+                                "LEFT JOIN entry_class ON entry.class_id = entry_class.class_id " +
+                                "" +
+                                "LEFT JOIN entry_hour AS default_hour ON entry.default_hour_id = default_hour.hour_id " +
+                                "LEFT JOIN entry_room AS default_room ON entry.default_room_id = default_room.room_id " +
+                                "LEFT JOIN entry_teacher AS default_teacher ON entry.default_teacher_id = default_teacher.teacher_id " +
+                                "LEFT JOIN entry_subject AS default_subject ON entry.default_subject_id = default_subject.subject_id " +
+                                "" +
+                                "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
+                                "GROUP BY entry.entry_id;");
+                try {
+                    while (resultSet.next()) {
+                        VertretungsEntry entry = new VertretungsEntry(
+                                resultSet.getInt("entry_id"),
+                                resultSet.getTimestamp("registration_timestamp").toLocalDateTime(),
+                                resultSet.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
+                                resultSet.getString("class"),
+                                resultSet.getString("default_hour"),
+                                resultSet.getString("default_room"),
+                                resultSet.getString("default_teacher_short")+" ("+resultSet.getString("default_teacher_long")+")",
+                                resultSet.getString("default_subject"));
+                        entry.setLastEntryUpdate(getLastVertretungsEntryUpdate(entry));
+                        list.add(entry);
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
+        }
+        return list;
     }
 
     public static VertretungsEntryUpdate getLastVertretungsEntryUpdate(VertretungsEntry entry){
         if(entry.getEntryId() == 0) return null;
-        //TODO: select just what is needed!
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry_update " +
-                "LEFT JOIN entry_timestamp AS register_datetime ON entry_update.registration_timestamp_id = register_datetime.timestamp_id " +
+        VertretungsEntryUpdate vertretungsEntryUpdate = null;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM entry_update " +
+                        "LEFT JOIN entry_timestamp AS register_datetime ON entry_update.registration_timestamp_id = register_datetime.timestamp_id " +
 
-                "LEFT JOIN entry_update_note ON entry_update.entry_update_id = entry_update_note.entry_update_id " +
-                "LEFT JOIN entry_note ON entry_note.note_id = entry_update_note.note_id " +
+                        "LEFT JOIN entry_update_note ON entry_update.entry_update_id = entry_update_note.entry_update_id " +
+                        "LEFT JOIN entry_note ON entry_note.note_id = entry_update_note.note_id " +
 
-                "LEFT JOIN entry_update_hour ON entry_update.entry_update_id = entry_update_hour.entry_update_id " +
-                "LEFT JOIN entry_hour ON entry_hour.hour_id = entry_update_hour.hour_id " +
+                        "LEFT JOIN entry_update_hour ON entry_update.entry_update_id = entry_update_hour.entry_update_id " +
+                        "LEFT JOIN entry_hour ON entry_hour.hour_id = entry_update_hour.hour_id " +
 
-                "LEFT JOIN entry_update_room ON entry_update.entry_update_id = entry_update_room.entry_update_id " +
-                "LEFT JOIN entry_room ON entry_room.room_id = entry_update_room.room_id " +
+                        "LEFT JOIN entry_update_room ON entry_update.entry_update_id = entry_update_room.entry_update_id " +
+                        "LEFT JOIN entry_room ON entry_room.room_id = entry_update_room.room_id " +
 
-                "LEFT JOIN entry_update_teacher ON entry_update.entry_update_id = entry_update_teacher.entry_update_id " +
-                "LEFT JOIN entry_teacher ON entry_teacher.teacher_id = entry_update_teacher.teacher_id " +
+                        "LEFT JOIN entry_update_teacher ON entry_update.entry_update_id = entry_update_teacher.entry_update_id " +
+                        "LEFT JOIN entry_teacher ON entry_teacher.teacher_id = entry_update_teacher.teacher_id " +
 
-                "LEFT JOIN entry_update_subject ON entry_update.entry_update_id = entry_update_subject.entry_update_id " +
-                "LEFT JOIN entry_subject ON entry_subject.subject_id = entry_update_subject.subject_id " +
+                        "LEFT JOIN entry_update_subject ON entry_update.entry_update_id = entry_update_subject.entry_update_id " +
+                        "LEFT JOIN entry_subject ON entry_subject.subject_id = entry_update_subject.subject_id " +
 
-                "WHERE entry_id = "+entry.getEntryId()+" " +
-                "ORDER BY registration_timestamp_id DESC LIMIT 1");
-        try{
-            while (rs.next()) {
-                //TODO: locally save vars or verify they are saved locally - Working for testing...
-                VertretungsEntryUpdate entryUpdate = new VertretungsEntryUpdate(entry, rs.getTimestamp("register_datetime.timestamp_time").toLocalDateTime());
-                if(rs.getString("entry_note.note_name") != null && !rs.getString("entry_note.note_name").equalsIgnoreCase("null")) entryUpdate.setNote(rs.getString("entry_note.note_name"));
-                if(rs.getString("entry_hour.hour_name") != null && !rs.getString("entry_hour.hour_name").equalsIgnoreCase("null")) entryUpdate.setHour(rs.getString("entry_hour.hour_name"));
-                if(rs.getString("entry_room.room_name") != null && !rs.getString("entry_room.room_name").equalsIgnoreCase("null")) entryUpdate.setRoom(rs.getString("entry_room.room_name"));
-                if(rs.getString("entry_teacher.teacher_name") != null && !rs.getString("entry_teacher.teacher_name").equalsIgnoreCase("null")) entryUpdate.setTeacherLong(rs.getString("entry_teacher.teacher_name"));
-                if(rs.getString("entry_teacher.teacher_short") != null && !rs.getString("entry_teacher.teacher_short").equalsIgnoreCase("null")) entryUpdate.setTeacherShort(rs.getString("entry_teacher.teacher_short"));
-                if(rs.getString("entry_subject.subject_name") != null && !rs.getString("entry_subject.subject_name").equalsIgnoreCase("null")) entryUpdate.setSubject(rs.getString("entry_subject.subject_name"));
-                return (entryUpdate);
+                        "WHERE entry_id = "+entry.getEntryId()+" " +
+                        "ORDER BY registration_timestamp_id DESC LIMIT 1");
+                try {
+                    if(resultSet.next()) {
+                        //TODO: locally save vars or verify they are saved locally - Working for testing...
+                        VertretungsEntryUpdate entryUpdate = new VertretungsEntryUpdate(entry, resultSet.getTimestamp("register_datetime.timestamp_time").toLocalDateTime());
+                        if(resultSet.getString("entry_note.note_name") != null && !resultSet.getString("entry_note.note_name").equalsIgnoreCase("null")) entryUpdate.setNote(resultSet.getString("entry_note.note_name"));
+                        if(resultSet.getString("entry_hour.hour_name") != null && !resultSet.getString("entry_hour.hour_name").equalsIgnoreCase("null")) entryUpdate.setHour(resultSet.getString("entry_hour.hour_name"));
+                        if(resultSet.getString("entry_room.room_name") != null && !resultSet.getString("entry_room.room_name").equalsIgnoreCase("null")) entryUpdate.setRoom(resultSet.getString("entry_room.room_name"));
+                        if(resultSet.getString("entry_teacher.teacher_name") != null && !resultSet.getString("entry_teacher.teacher_name").equalsIgnoreCase("null")) entryUpdate.setTeacherLong(resultSet.getString("entry_teacher.teacher_name"));
+                        if(resultSet.getString("entry_teacher.teacher_short") != null && !resultSet.getString("entry_teacher.teacher_short").equalsIgnoreCase("null")) entryUpdate.setTeacherShort(resultSet.getString("entry_teacher.teacher_short"));
+                        if(resultSet.getString("entry_subject.subject_name") != null && !resultSet.getString("entry_subject.subject_name").equalsIgnoreCase("null")) entryUpdate.setSubject(resultSet.getString("entry_subject.subject_name"));
+                        vertretungsEntryUpdate = entryUpdate;
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return null;
+        return vertretungsEntryUpdate;
     }
 
     public static List<String> getAllData(long chatId) {
         List<String> list = new ArrayList<>();
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM user WHERE chat_id=" + chatId);
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if (rs != null && rs.next()) {
-                list.add("Vorname: " + rs.getString("user_first_name"));
-                list.add("Nachname: " + rs.getString("user_last_name"));
-                list.add("Beitritt: "+rs.getTimestamp("registration_timestamp").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM user WHERE chat_id=" + chatId);
+                try {
+                    if (resultSet.next()) {
+                        list.add("Vorname: " + resultSet.getString("user_first_name"));
+                        list.add("Nachname: " + resultSet.getString("user_last_name"));
+                        list.add("Beitritt: "+resultSet.getTimestamp("registration_timestamp").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                        list.add(" ");
+                        list.add("Alle notifications & reminds:");
+                        for (String s : getAllNotifyingClassesByChatId(chatId)) {
+                            List<String> reminds = SQLManager.getAllReminderByClassAndChatId(s, chatId);
+                            if(reminds.isEmpty()){
+                                list.add("- " + s);
+                            }else{
+                                list.add("- "+s);
+                                for (String remind : reminds) {
+                                    list.add("  - "+remind);
+                                }
+                            }
+                        }
+                    }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        list.add(" ");
-        list.add("Alle notifications & reminds:");
-        for (String s : getAllNotifiesByChatId(chatId)) {
-            List<String> reminds = SQLManager.getAllReminderByClassAndChatId(s, chatId);
-            if(reminds.isEmpty()){
-                list.add("- " + s);
-            }else{
-                list.add("- "+s);
-                for (String remind : reminds) {
-                    list.add("  - "+remind);
+                } finally {
+                    resultSet.close();
                 }
+            } finally {
+                statement.close();
             }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
@@ -339,63 +448,58 @@ public class SQLManager {
     }
 
 
-    @NotNull
-    private static List<VertretungsEntry> getVertretungsEntries(ResultSet rs) {
+/*    @NotNull
+    private static List<VertretungsEntry> getVertretungsEntries(ResultSet resultSet) {
         List<VertretungsEntry> list = new ArrayList<>();
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            while (rs.next()) {
-                VertretungsEntry entry = new VertretungsEntry(
-                        rs.getInt("entry_id"),
-                        rs.getTimestamp("registration_timestamp").toLocalDateTime(),
-                        rs.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
-                        rs.getString("class"),
-                        rs.getString("default_hour"),
-                        rs.getString("default_room"),
-                        rs.getString("default_teacher_short")+" ("+rs.getString("default_teacher_long")+")",
-                        rs.getString("default_subject"));
-                entry.setLastEntryUpdate(getLastVertretungsEntryUpdate(entry));
-                list.add(entry);
+            Statement statement = connection.createStatement();
+            try {
+                try {
+                    while (resultSet.next()) {
+                        VertretungsEntry entry = new VertretungsEntry(
+                                resultSet.getInt("entry_id"),
+                                resultSet.getTimestamp("registration_timestamp").toLocalDateTime(),
+                                resultSet.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
+                                resultSet.getString("class"),
+                                resultSet.getString("default_hour"),
+                                resultSet.getString("default_room"),
+                                resultSet.getString("default_teacher_short")+" ("+resultSet.getString("default_teacher_long")+")",
+                                resultSet.getString("default_subject"));
+                        entry.setLastEntryUpdate(getLastVertretungsEntryUpdate(entry));
+                        list.add(entry);
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
-    }
-
-    public static List<VertretungsEntry> getAllEntries() {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry LIMIT 20");
-        return getVertretungsEntries(rs);
-    }
-
-    public static VertretungsEntry getEntry(int entryId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM entry WHERE entry_id=" + entryId);
-        try {
-            while (rs.next()) {
-                return (new VertretungsEntry(
-                        rs.getInt("entry_id"),
-                        rs.getTimestamp("registration_timestamp").toLocalDateTime(),
-                        rs.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
-                        rs.getString("class"),
-                        rs.getString("default_hour"),
-                        rs.getString("default_room"),
-                        rs.getString("default_teacher"),
-                        rs.getString("default_subject")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
+    }*/
 
     public static boolean exists(String table, String column, String value) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT * FROM " + table + " WHERE " + column + "='" + value + "'");
+        boolean exists = false;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if (rs.next()) return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + table + " WHERE " + column + "='" + value + "'");
+                try {
+                    if (resultSet.next()) exists = true;
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return false;
+        return exists;
     }
 
 
@@ -417,81 +521,151 @@ public class SQLManager {
     }
 
     public static List<Long> getAllChatIDsByNotifyClass(String className) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT chat_id FROM notification" +
-                " INNER JOIN user ON notification.user_id = user.user_id" +
-                " WHERE class='" + className + "'");
         List<Long> list = new ArrayList<>();
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            while (rs.next()) {
-                list.add(rs.getLong("chat_id"));
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT chat_id FROM notification" +
+                        " INNER JOIN user ON notification.user_id = user.user_id" +
+                        " WHERE class='" + className + "'");
+                try {
+                    while (resultSet.next()) {
+                        list.add(resultSet.getLong("chat_id"));
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
 
-    public static List<String> getAllNotifiesByUserId(int userId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT class FROM notification" +
-                " WHERE user_id=" + userId);
+    public static List<String> getAllNotifiesClassesByUserId(int userId) {
         List<String> list = new ArrayList<>();
+
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            while (rs.next()) {
-                list.add(rs.getString("class"));
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT class FROM notification" +
+                        " WHERE user_id=" + userId);
+                try {
+                    while (resultSet.next()) {
+                        list.add(resultSet.getString("class"));
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
 
-    public static List<String> getAllNotifiesByChatId(long chatId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT class FROM notification" +
-                " INNER JOIN user ON notification.user_id = user.user_id" +
-                " WHERE chat_id =" + chatId);
+    public static List<String> getAllNotifyingClassesByChatId(long chatId) {
         List<String> list = new ArrayList<>();
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            while (rs.next()) {
-                list.add(rs.getString("class"));
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT class FROM notification" +
+                        " INNER JOIN user ON notification.user_id = user.user_id" +
+                        " WHERE chat_id =" + chatId);
+                try {
+                    while (resultSet.next()) {
+                        list.add(resultSet.getString("class"));
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
 
     public static boolean isRegistered(long chatId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT user_id FROM user WHERE chat_id=" + chatId);
+        boolean exists = false;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if (rs.next()) return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT user_id FROM user WHERE chat_id=" + chatId);
+                try {
+                    if (resultSet.next()) exists = true;
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return false;
+        return exists;
+
     }
 
     public static List<VertretungsEntry> getAllRelevantEntriesByClass(String className) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet(
-                "SELECT entry.entry_id AS entry_id, register_datetime.timestamp_time AS registration_timestamp, " +
-                "representation_date.timestamp_time AS representation_date, entry_class.class_name AS class, default_hour.hour_name AS default_hour, " +
-                "default_room.room_name AS default_room, default_teacher.teacher_name AS default_teacher_long, default_teacher.teacher_short AS default_teacher_short, default_subject.subject_name AS default_subject " +
-                "FROM entry " +
-                "" +
-                "LEFT JOIN entry_timestamp AS register_datetime ON entry.registration_timestamp_id = register_datetime.timestamp_id " +
-                "LEFT JOIN entry_timestamp AS representation_date ON entry.representation_date_id = representation_date.timestamp_id " +
-                "" +
-                "LEFT JOIN entry_class ON entry.class_id = entry_class.class_id " +
-                "" +
-                "LEFT JOIN entry_hour AS default_hour ON entry.default_hour_id = default_hour.hour_id " +
-                "LEFT JOIN entry_room AS default_room ON entry.default_room_id = default_room.room_id " +
-                "LEFT JOIN entry_teacher AS default_teacher ON entry.default_teacher_id = default_teacher.teacher_id " +
-                "LEFT JOIN entry_subject AS default_subject ON entry.default_subject_id = default_subject.subject_id " +
-                "" +
-                "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
-                        "AND entry.class_id=" + "(SELECT class_id FROM entry_class WHERE class_name='"+className+"')" +
-                "GROUP BY entry.entry_id;");
-        if(rs == null) return new ArrayList<>();
-        return getVertretungsEntries(rs);
+        List<VertretungsEntry> list = new ArrayList<>();
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT entry.entry_id AS entry_id, register_datetime.timestamp_time AS registration_timestamp, " +
+                                "representation_date.timestamp_time AS representation_date, entry_class.class_name AS class, default_hour.hour_name AS default_hour, " +
+                                "default_room.room_name AS default_room, default_teacher.teacher_name AS default_teacher_long, default_teacher.teacher_short AS default_teacher_short, default_subject.subject_name AS default_subject " +
+                                "FROM entry " +
+                                "" +
+                                "LEFT JOIN entry_timestamp AS register_datetime ON entry.registration_timestamp_id = register_datetime.timestamp_id " +
+                                "LEFT JOIN entry_timestamp AS representation_date ON entry.representation_date_id = representation_date.timestamp_id " +
+                                "" +
+                                "LEFT JOIN entry_class ON entry.class_id = entry_class.class_id " +
+                                "" +
+                                "LEFT JOIN entry_hour AS default_hour ON entry.default_hour_id = default_hour.hour_id " +
+                                "LEFT JOIN entry_room AS default_room ON entry.default_room_id = default_room.room_id " +
+                                "LEFT JOIN entry_teacher AS default_teacher ON entry.default_teacher_id = default_teacher.teacher_id " +
+                                "LEFT JOIN entry_subject AS default_subject ON entry.default_subject_id = default_subject.subject_id " +
+                                "" +
+                                "WHERE representation_date.timestamp_time >= CURRENT_DATE " +
+                                "AND entry.class_id=" + "(SELECT class_id FROM entry_class WHERE class_name='"+className+"')" +
+                                "GROUP BY entry.entry_id;");
+                try {
+                    while (resultSet.next()) {
+                        VertretungsEntry entry = new VertretungsEntry(
+                                resultSet.getInt("entry_id"),
+                                resultSet.getTimestamp("registration_timestamp").toLocalDateTime(),
+                                resultSet.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
+                                resultSet.getString("class"),
+                                resultSet.getString("default_hour"),
+                                resultSet.getString("default_room"),
+                                resultSet.getString("default_teacher_short")+" ("+resultSet.getString("default_teacher_long")+")",
+                                resultSet.getString("default_subject"));
+                        entry.setLastEntryUpdate(getLastVertretungsEntryUpdate(entry));
+                        list.add(entry);
+                    }
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
+        }
+        return list;
     }
 
     public static boolean insertNewRemind(long chatId, String className, String hour){
@@ -511,19 +685,27 @@ public class SQLManager {
     }
 
     public static List<String> getAllReminderByClassAndChatId(String className, long chatId) {
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT hour FROM remind " +
-                "INNER JOIN notification ON notification.notification_id = remind.notification_id " +
-                "INNER JOIN user ON user.chat_id = "+ chatId+" " +
-                "WHERE notification.class = '"+className+"' AND user.user_id = notification.user_id;");
         List<String> list = new ArrayList<>();
-        if(rs != null){
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
             try {
-                while (rs.next()) {
-                    list.add(rs.getString("hour"));
+                ResultSet resultSet = statement.executeQuery("SELECT hour FROM remind " +
+                        "INNER JOIN notification ON notification.notification_id = remind.notification_id " +
+                        "INNER JOIN user ON user.chat_id = "+ chatId+" " +
+                        "WHERE notification.class = '"+className+"' AND user.user_id = notification.user_id;");
+                try {
+                    while (resultSet.next()) {
+                        list.add(resultSet.getString("hour"));
+                    }
+                } finally {
+                    resultSet.close();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } finally {
+                statement.close();
             }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
@@ -537,33 +719,49 @@ public class SQLManager {
 
     public static List<Remind> getAllRemindsByTime(String currentTime) {
         List<Remind> list = new ArrayList<>();
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT chat_id, hour, class FROM remind " +
-                "LEFT JOIN notification ON notification.notification_id = remind.notification_id " +
-                "LEFT JOIN user ON user.user_id = notification.user_id " +
-                "WHERE hour='"+currentTime+"' OR hour='T"+currentTime+"'");
-        if(rs != null){
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
             try {
-                while (rs.next()) {
-                    list.add(new Remind(rs.getLong("chat_id"), rs.getString("class"), rs.getString("hour")));
+                ResultSet resultSet = statement.executeQuery("SELECT chat_id, hour, class FROM remind " +
+                        "LEFT JOIN notification ON notification.notification_id = remind.notification_id " +
+                        "LEFT JOIN user ON user.user_id = notification.user_id " +
+                        "WHERE hour='"+currentTime+"' OR hour='T"+currentTime+"'");
+                try {
+                    while (resultSet.next()) {
+                        list.add(new Remind(resultSet.getLong("chat_id"), resultSet.getString("class"), resultSet.getString("hour")));
+                    }
+                } finally {
+                    resultSet.close();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } finally {
+                statement.close();
             }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
 
     public static List<Long> getAllChatIds() {
         List<Long> list = new ArrayList<>();
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT chat_id FROM user;");
-        if(rs != null){
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
             try {
-                while (rs.next()) {
-                    list.add(rs.getLong("chat_id"));
+                ResultSet resultSet = statement.executeQuery("SELECT chat_id FROM user;");
+                try {
+                    while (resultSet.next()) {
+                        list.add(resultSet.getLong("chat_id"));
+                    }
+                } finally {
+                    resultSet.close();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } finally {
+                statement.close();
             }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
         return list;
     }
@@ -573,15 +771,26 @@ public class SQLManager {
     }
 
     public static boolean hasAcceptedCleverBot(Long chatId){
-        ResultSet rs = VertretungsPlanBot.getSqlConnector().getResultSet("SELECT clever_bot_agree.user_id FROM clever_bot_agree " +
-                "LEFT JOIN user ON user.user_id = clever_bot_agree.user_id " +
-                "WHERE user.chat_id = "+chatId+";");
+        boolean agreed = false;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
         try {
-            if (rs.next()) return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT clever_bot_agree.user_id FROM clever_bot_agree " +
+                        "LEFT JOIN user ON user.user_id = clever_bot_agree.user_id " +
+                        "WHERE user.chat_id = "+chatId+";");
+                try {
+                    if (resultSet.next()) agreed = true;
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
         }
-        return false;
+        return agreed;
     }
     public static void agreeCleverBot(Long chatId){
         VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO clever_bot_agree(user_id) VALUES ((SELECT user_id FROM user WHERE chat_id="+chatId+"));");

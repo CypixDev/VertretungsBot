@@ -185,6 +185,7 @@ public class SQLConnector {
                 //preparedStatement.close();
                 //return rs;
             } catch (SQLException e) {
+                logger.error(e);
                 e.printStackTrace();
             }
         }
@@ -240,7 +241,7 @@ public class SQLConnector {
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }else {
             reconnect();
@@ -248,8 +249,7 @@ public class SQLConnector {
                 PreparedStatement preparedStatement = connection.prepareStatement(qry);
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException e) {logger.error(e);
             }
         }
     }
