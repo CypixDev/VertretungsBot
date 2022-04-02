@@ -33,7 +33,7 @@ public class Updater extends Thread {
     public void run() {
         try {
             while (keepRunning()) {
-                if(LocalDateTime.now().getHour() < 23 && LocalDateTime.now().getHour() >= 1){
+                if((LocalDateTime.now().getHour() < 23 && LocalDateTime.now().getHour() >= 1) || VertretungsPlanBot.getConfigManager().isMaintenance()){
                     try {
                         URL url = new URL("https://btr-rs.de/btr-old/service-vertretungsplan.php");
                         Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
@@ -169,12 +169,19 @@ public class Updater extends Thread {
                                         "Klasse: "+entry.getClassName()+"\n" +
                                         "Stunden: "+entry.getDefaultHour()));
                                 SQLManager.deleteEntry(entry.getEntryId());
+                                for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(entry.getClassName())) {
+                                    VertretungsPlanBot.getBot().execute(new SendMessage(allChatIDsByNotifyClass,"Eintrag weggefallen:\n" +
+                                            "Datum: "+entry.getRepresentationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))+"\n" +
+                                            "Klasse: "+entry.getClassName()+"\n" +
+                                            "Stunden: "+entry.getDefaultHour()));
+                                }
                             }
                         }
 
                     } catch (Exception e) {
                         logger.error(e);
                         VertretungsPlanBot.getBot().execute(new SendMessage(259699517, "Error in Updater.... pls CHECK ME!!!!\n"+e.getMessage()));
+                        simulateAdd = false;
                     }
 
                     long chatId = 259699517; //Chat id von Pius

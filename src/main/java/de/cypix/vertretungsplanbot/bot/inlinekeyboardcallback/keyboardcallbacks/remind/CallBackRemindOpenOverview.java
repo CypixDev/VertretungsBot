@@ -19,7 +19,7 @@ public class CallBackRemindOpenOverview implements KeyboardCallback {
     public boolean handleCallBack(String key, Update update, Chat chat, HashMap<String, String> data) {
         if(!getKey().equalsIgnoreCase(key)) return false;
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        for (String className : SQLManager.getAllNotifiesByChatId(chat.id())) {
+        for (String className : SQLManager.getAllNotifyingClassesByChatId(chat.id())) {
             inlineKeyboard.addRow(new InlineKeyboardButton(className).callbackData(
                     new KeyboardCallBackBuilder(KeyboardCallbackType.REMIND, "overviewReminds").addData("class", className).build()));
         }

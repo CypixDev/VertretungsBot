@@ -20,7 +20,7 @@ public class CMDRemind implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
 
-        List<String> listOfNotifies = SQLManager.getAllNotifiesByChatId(chat.id());
+        List<String> listOfNotifies = SQLManager.getAllNotifyingClassesByChatId(chat.id());
 
         if(listOfNotifies.isEmpty()) {
             VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Bitte abonniere erst eine Klasse"));

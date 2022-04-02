@@ -16,7 +16,7 @@ public class CMDNotifyList implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        for (String className : SQLManager.getAllNotifiesByChatId(chat.id())) {
+        for (String className : SQLManager.getAllNotifyingClassesByChatId(chat.id())) {
             inlineKeyboard.addRow(new InlineKeyboardButton(className).callbackData(
                     new KeyboardCallBackBuilder(KeyboardCallbackType.NOTIFY, "overview").addData("class", className).build()));
         }

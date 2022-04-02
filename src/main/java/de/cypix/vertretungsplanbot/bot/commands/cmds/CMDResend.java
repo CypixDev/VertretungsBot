@@ -12,7 +12,10 @@ import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 public class CMDResend implements TelegramCommand {
     @Override
     public void performCommand(User user, Chat chat, Message message, String[] args) {
-        for (String s : SQLManager.getAllNotifiesByChatId(chat.id())) {
+        if(VertretungsPlanBot.getConfigManager().isMaintenance()){
+            VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), "Hier könnte deine Nachricht stehen!!!"));
+        }
+        for (String s : SQLManager.getAllNotifyingClassesByChatId(chat.id())) {
             for (VertretungsEntry allRelevantEntriesByClass : SQLManager.getAllRelevantEntriesByClass(s)) {
                 VertretungsPlanBot.getBot().execute(new SendMessage(chat.id(), allRelevantEntriesByClass.getSendUpdateMessage("Eintrag")));
             }
