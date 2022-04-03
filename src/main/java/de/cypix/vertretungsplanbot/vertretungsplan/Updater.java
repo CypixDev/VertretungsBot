@@ -64,7 +64,8 @@ public class Updater extends Thread {
 
 
                         if(simulateAdd){
-                            newEntries.add(new VertretungsEntry(LocalDateTime.now(), LocalDate.now(), "DI91", "XXXX", "YYYY", "Frau DR. Hold", "KAKA"));
+                            newEntries.add(new VertretungsEntry(LocalDateTime.now(), LocalDate.now(), "TEST", "XXXX", "YYYY", "DR (Frau Dr. Hold)", "KAKA"));
+                            simulateAdd = false;
                         }
                         for (VertretungsEntry newEntry : newEntries) {
                             //If none fits it is probably a new entry
@@ -133,6 +134,8 @@ public class Updater extends Thread {
 
                                 if(!newEntry.getClassName().equals("TEST")){ //For simulation....
                                     SQLManager.insertNewEntry(newEntry);
+                                }else{
+                                    newEntry.setLastEntryUpdate(new VertretungsEntryUpdate(newEntry, LocalDateTime.now()));
                                 }
                                 logger.info("Added new entry["+newEntry.toString()+"\n Update: "+newEntry.getLastEntryUpdate().toString()+"]\n");
                                 for (Long allChatIDsByNotifyClass : SQLManager.getAllChatIDsByNotifyClass(newEntry.getClassName())) {
@@ -346,7 +349,7 @@ public class Updater extends Thread {
                         entryUpdate.setRoom(newRoom);
                         //Check is needed her because of split.... Others don't need because 'null' will be filtered out...
                         if(!newTeacher.equalsIgnoreCase("null") && !newTeacher.equalsIgnoreCase("") && !newTeacher.equalsIgnoreCase(" ")){
-                            if(newTeacher.contains("DR.")){
+                            if(newTeacher.contains("Dr.")){
                                 entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", "")+" "+newTeacher.split(" ")[3].replace(")", ""));
                             }else{
                                 entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", ""));

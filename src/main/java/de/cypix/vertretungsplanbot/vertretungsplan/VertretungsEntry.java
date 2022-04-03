@@ -93,9 +93,8 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
     }
 
     public String getDefaultTeacherLong() {
-        if(defaultTeacher.contains("DR.")){
+        if(defaultTeacher.contains("Dr.")){
             return defaultTeacher.split(" ")[1].replace("(", "")+" "+defaultTeacher.split(" ")[2].replace(")", "")+" "+defaultTeacher.split(" ")[3].replace(")", "");
-
         }else{
             return defaultTeacher.split(" ")[1].replace("(", "")+" "+defaultTeacher.split(" ")[2].replace(")", "");
         }
@@ -154,6 +153,7 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
                 ", defaultHour='" + defaultHour + '\'' +
                 ", defaultRoom='" + defaultRoom + '\'' +
                 ", defaultTeacherShort='" + getDefaultTeacherShort() + '\'' +
+                ", defaultTeacherLong='" + getDefaultTeacherLong() + '\'' +
                 ", defaultSubject='" + defaultSubject + '\'' +
                 '}';
     }
