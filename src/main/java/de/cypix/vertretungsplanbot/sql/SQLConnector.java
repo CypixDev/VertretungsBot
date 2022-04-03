@@ -164,34 +164,6 @@ public class SQLConnector {
         }
     }
 
-    @Deprecated
-    public ResultSet getResultSet(String query) {
-        if (isConnected()) {
-            try {
-                //PreparedStatement preparedStatement = connection.prepareStatement(query);
-                //ResultSet rs = preparedStatement.getResultSet();
-                return connection.createStatement().executeQuery(query);
-                //preparedStatement.close();
-                //return rs;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }else{
-            reconnect();
-            try {
-                //PreparedStatement preparedStatement = connection.prepareStatement(query);
-                //ResultSet rs = preparedStatement.getResultSet();
-                return connection.createStatement().executeQuery(query);
-                //preparedStatement.close();
-                //return rs;
-            } catch (SQLException e) {
-                logger.error(e);
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
     public boolean isConnected() {
         try {
             if (connection == null || !connection.isValid(10) || connection.isClosed()) {
@@ -233,7 +205,6 @@ public class SQLConnector {
         return false;
     }
 
-    @Deprecated
     public void executeUpdate(String qry) {
         if (isConnected()) {
             try {
@@ -249,7 +220,8 @@ public class SQLConnector {
                 PreparedStatement preparedStatement = connection.prepareStatement(qry);
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
-            } catch (SQLException e) {logger.error(e);
+            } catch (SQLException e) {
+                logger.error(e);
             }
         }
     }
@@ -272,6 +244,7 @@ public class SQLConnector {
             try {
                 connection.close();
             } catch (SQLException e) {
+                logger.error(e);
             } finally {
                 connection = null;
             }
@@ -282,9 +255,6 @@ public class SQLConnector {
         return connection;
     }
 
-    public static SQLConnector getInstance() {
-        return instance;
-    }
 
     private void reconnect() {
         if (firstConnected) {
