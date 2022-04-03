@@ -20,14 +20,24 @@ public class CallbackNotifyAddClassFinish implements KeyboardCallback {
         if(!getKey().equalsIgnoreCase(key)) return false;
         String className = data.get("class");
 
-        SQLManager.insertNewNotification(chat.id(), className);
+        if(SQLManager.existsNotification(chat.id(), className)){
+            EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Benachrichtigung für "+className+" ist bereits aktiviert!")
+                    .parseMode(ParseMode.HTML)
+                    .disableWebPagePreview(true)
+                    .replyMarkup(new InlineKeyboardMarkup());
 
-        EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Benachrichtigungen für "+className+" wurden erfolgreich aktiviert!")
-                .parseMode(ParseMode.HTML)
-                .disableWebPagePreview(true)
-                .replyMarkup(new InlineKeyboardMarkup());
+            VertretungsPlanBot.getBot().execute(editMessageText);
+        }else{
+            SQLManager.insertNewNotification(chat.id(), className);
+            EditMessageText editMessageText = new EditMessageText(chat.id(), update.callbackQuery().message().messageId(), "Benachrichtigungen für "+className+" wurden erfolgreich aktiviert!")
+                    .parseMode(ParseMode.HTML)
+                    .disableWebPagePreview(true)
+                    .replyMarkup(new InlineKeyboardMarkup());
 
-        VertretungsPlanBot.getBot().execute(editMessageText);
+            VertretungsPlanBot.getBot().execute(editMessageText);
+        }
+
+
         for (VertretungsEntry allRelevantEntriesByClass : SQLManager.getAllRelevantEntriesByClass(className)) {
             StringBuilder builder = new StringBuilder();
             builder.append("Neuer Eintrag für den ")

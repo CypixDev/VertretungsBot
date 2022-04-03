@@ -444,40 +444,6 @@ public class SQLManager {
         VertretungsPlanBot.getSqlConnector().executeUpdate("DELETE FROM notification WHERE user_id=(SELECT user_id FROM user WHERE chat_id=" + chatId + ") AND class='" + className + "';");
     }
 
-
-/*    @NotNull
-    private static List<VertretungsEntry> getVertretungsEntries(ResultSet resultSet) {
-        List<VertretungsEntry> list = new ArrayList<>();
-        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            try {
-                try {
-                    while (resultSet.next()) {
-                        VertretungsEntry entry = new VertretungsEntry(
-                                resultSet.getInt("entry_id"),
-                                resultSet.getTimestamp("registration_timestamp").toLocalDateTime(),
-                                resultSet.getTimestamp("representation_date").toLocalDateTime().toLocalDate(),
-                                resultSet.getString("class"),
-                                resultSet.getString("default_hour"),
-                                resultSet.getString("default_room"),
-                                resultSet.getString("default_teacher_short")+" ("+resultSet.getString("default_teacher_long")+")",
-                                resultSet.getString("default_subject"));
-                        entry.setLastEntryUpdate(getLastVertretungsEntryUpdate(entry));
-                        list.add(entry);
-                    }
-                } finally {
-                    resultSet.close();
-                }
-            } finally {
-                statement.close();
-            }
-        }catch (SQLException ex) {
-            logger.error(ex);
-        }
-        return list;
-    }*/
-
     public static boolean exists(String table, String column, String value) {
         boolean exists = false;
         Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
@@ -511,10 +477,33 @@ public class SQLManager {
                 lastName + "')");
     }
 
-    public static void insertNewNotification(Long chatId, String className) {
-        VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO notification(user_id, class) " +
+    public static boolean insertNewNotification(Long chatId, String className) {
+       return VertretungsPlanBot.getSqlConnector().executeUpdateWithFeedBack("INSERT INTO notification(user_id, class) " +
                 "VALUES " +
                 "((SELECT user_id FROM user WHERE chat_id=" + chatId + ") , '" + className + "');");
+    }
+
+    public static boolean existsNotification(Long chatId, String className){
+        boolean exists = false;
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            try {
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM notification " +
+                        "LEFT JOIN user ON notification.user_id = user.user_id " +
+                        "WHERE notification.class = '"+className+"' AND chat_id = "+chatId);
+                try {
+                    if (resultSet.next()) exists = true;
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
+        }
+        return exists;
     }
 
     public static List<Long> getAllChatIDsByNotifyClass(String className) {
