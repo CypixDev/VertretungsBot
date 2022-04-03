@@ -93,7 +93,12 @@ public class VertretungsEntry implements Comparable<VertretungsEntry> {
     }
 
     public String getDefaultTeacherLong() {
-        return defaultTeacher.split(" ")[1].replace("(", "")+" "+defaultTeacher.split(" ")[2].replace(")", "");
+        if(defaultTeacher.contains("DR.")){
+            return defaultTeacher.split(" ")[1].replace("(", "")+" "+defaultTeacher.split(" ")[2].replace(")", "")+" "+defaultTeacher.split(" ")[3].replace(")", "");
+
+        }else{
+            return defaultTeacher.split(" ")[1].replace("(", "")+" "+defaultTeacher.split(" ")[2].replace(")", "");
+        }
     }
     public String getDefaultSubject() {
         return defaultSubject;

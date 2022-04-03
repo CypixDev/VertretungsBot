@@ -95,6 +95,7 @@ public class VertretungsPlanBot {
         commandManager.registerCommand("/remind", new CMDRemind());
         commandManager.registerCommand("/resend", new CMDResend());
         commandManager.registerCommand("/changelog", new CMDChangelog());
+        commandManager.registerCommand("/hallopius", new CMDHalloPius());
     }
 
     private static void registerKeyBoardCallBacks(){
@@ -104,6 +105,7 @@ public class VertretungsPlanBot {
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyAddClass());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyAddClassFinish());
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyOpenAddOverview());
+        keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.NOTIFY, new CallbackNotifyStats());
 
 
         keyBoardCallBackManager.registerCallBack(KeyboardCallbackType.REMIND, new CallBackRemindAddRemind());

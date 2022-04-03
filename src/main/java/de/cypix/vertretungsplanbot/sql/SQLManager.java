@@ -5,7 +5,6 @@ import de.cypix.vertretungsplanbot.remind.Remind;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntry;
 import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntryUpdate;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -798,5 +797,7 @@ public class SQLManager {
             logger.error(ex);
         }
     }
+
+    //Stats
 
 }

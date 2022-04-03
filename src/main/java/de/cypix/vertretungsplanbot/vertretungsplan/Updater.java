@@ -64,7 +64,7 @@ public class Updater extends Thread {
 
 
                         if(simulateAdd){
-                            newEntries.add(new VertretungsEntry(LocalDateTime.now(), LocalDate.now(), "TEST", "XXXX", "YYYY", "HHAA", "KAKA"));
+                            newEntries.add(new VertretungsEntry(LocalDateTime.now(), LocalDate.now(), "DI91", "XXXX", "YYYY", "Frau DR. Hold", "KAKA"));
                         }
                         for (VertretungsEntry newEntry : newEntries) {
                             //If none fits it is probably a new entry
@@ -346,7 +346,11 @@ public class Updater extends Thread {
                         entryUpdate.setRoom(newRoom);
                         //Check is needed her because of split.... Others don't need because 'null' will be filtered out...
                         if(!newTeacher.equalsIgnoreCase("null") && !newTeacher.equalsIgnoreCase("") && !newTeacher.equalsIgnoreCase(" ")){
-                            entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", ""));
+                            if(newTeacher.contains("DR.")){
+                                entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", "")+" "+newTeacher.split(" ")[3].replace(")", ""));
+                            }else{
+                                entryUpdate.setTeacherLong(newTeacher.split(" ")[1].replace("(", "")+" "+newTeacher.split(" ")[2].replace(")", ""));
+                            }
                             entryUpdate.setTeacherShort(newTeacher.split(" ")[0]);
                         }
                         entryUpdate.setSubject(newSubject);
