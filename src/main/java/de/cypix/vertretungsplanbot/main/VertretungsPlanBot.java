@@ -1,7 +1,7 @@
 package de.cypix.vertretungsplanbot.main;
 
 import com.pengrad.telegrambot.TelegramBot;
-import de.cypix.vertretungsplanbot.bot.cleverbot.CleverBotManager;
+import de.cypix.vertretungsplanbot.bot.chatterbot.CleverBotManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackManager;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.keyboardcallbacks.cleverbot.CallbackCleverBotAgree;

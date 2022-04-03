@@ -22,6 +22,9 @@ public class RemindScheduler extends Thread{
     public void run() {
         try {
             while (keepRunning()) {
+                //Check if some sessions has been expired
+                VertretungsPlanBot.getCleverBotManager().checkOutdated();
+
                 String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 
                 for (Remind remind : SQLManager.getAllRemindsByTime(currentTime)) {

@@ -7,10 +7,7 @@ import de.cypix.vertretungsplanbot.vertretungsplan.VertretungsEntryUpdate;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -794,6 +791,23 @@ public class SQLManager {
     }
     public static void agreeCleverBot(Long chatId){
         VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO clever_bot_agree(user_id) VALUES ((SELECT user_id FROM user WHERE chat_id="+chatId+"));");
+    }
+    public static void insertNewConversation(long chatId, String input, String output){
+        //VertretungsPlanBot.getSqlConnector().executeUpdate("INSERT INTO clever_bot_log(user_id, message, answer) VALUES ((SELECT user_id FROM user WHERE chat_id="+chatId+"), '"+input+"', '"+output+"');");
+
+        Connection connection = VertretungsPlanBot.getSqlConnector().getConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO clever_bot_log(user_id, message, answer) VALUES ((SELECT user_id FROM user WHERE chat_id="+chatId+"), ?, ?);");
+            try {
+                statement.setString(1, input);
+                statement.setString(2, output);
+                statement.executeUpdate();
+            } finally {
+                statement.close();
+            }
+        }catch (SQLException ex) {
+            logger.error(ex);
+        }
     }
 
 }

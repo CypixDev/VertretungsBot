@@ -3,7 +3,6 @@ package de.cypix.vertretungsplanbot.bot.listener;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import de.cypix.vertretungsplanbot.bot.CleverBot;
 import de.cypix.vertretungsplanbot.bot.inlinekeyboardcallback.KeyboardCallbackType;
 import de.cypix.vertretungsplanbot.main.VertretungsPlanBot;
 import de.cypix.vertretungsplanbot.sql.SQLManager;
@@ -34,7 +33,7 @@ public class BotListener implements UpdatesListener {
                     VertretungsPlanBot.getEnterMessageManager().end(update.message().text(), update.message().chat().id());
                 }else{
                     if (update.message().text() != null) {
-                        logger.info("Received message ["+update.message().chat().id()+"] " + update.message().text());
+                        logger.info("Received message ["+update.message().chat().id()+", "+SQLManager.getNameByChatId(update.message().chat().id())+"] " + update.message().text());
                         message = update.message().text();
                         args = message.split(" ");
                     }
