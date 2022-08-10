@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -183,7 +184,9 @@ public class Updater extends Thread {
 
                     } catch (Exception e) {
                         logger.error(e);
-                        VertretungsPlanBot.getBot().execute(new SendMessage(259699517, "Error in Updater.... pls CHECK ME!!!!\n"+e.getMessage()));
+                        if(!(e instanceof UnknownHostException))
+                            VertretungsPlanBot.getBot().execute(new SendMessage(259699517, "Error in Updater.... pls CHECK ME!!!!\n\n"+e.getMessage()));
+
                         simulateAdd = false;
                     }
 
